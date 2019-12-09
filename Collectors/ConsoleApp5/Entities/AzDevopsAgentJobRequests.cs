@@ -14,7 +14,6 @@ namespace AzureDataExplorer
         private readonly string mappingName = "AgentJobRequests_mapping_2";
         private readonly string organizationName;
         private readonly string projectId;
-        private int BatchSize = 10000;
 
         public AzDevopsAgentJobRequests(AgentJobRequestAPIProvider agentsRequestRestApiProvider, string serviceNameAndRegion, string authority, string organizationName, string projectId)
             : base(serviceNameAndRegion, authority)

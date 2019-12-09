@@ -15,6 +15,7 @@ namespace AzureDataExplorer
         private readonly string _mappingName = "ReleaseDefinition_mapping_2";
         private readonly string _organizationName;
         private readonly string _projectId;
+        private int BatchSize = 10000;
 
         public AzDevopsReleaseDefinition(ReleaseRestAPIProvider releaseRestApiProvider, string serviceNameAndRegion, string authority, string organizationName, string projectId)
             : base(serviceNameAndRegion, authority)
@@ -75,7 +76,7 @@ namespace AzureDataExplorer
                     writer.WriteLine(JsonConvert.SerializeObject(jObject));
                 }
 
-            } while (continuationToken != 0 && count <= 2000);
+            } while (continuationToken != 0 && count <= BatchSize);
         }
 
         protected override List<Tuple<string, string>> GetColumns()

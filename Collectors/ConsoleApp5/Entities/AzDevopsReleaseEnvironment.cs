@@ -85,7 +85,7 @@ namespace AzureDataExplorer
                     }
                 }
 
-            } while (continuationToken != 0 && count <= 2000);
+            } while (continuationToken != 0 && count <= BatchSize);
         }
 
         protected override List<Tuple<string, string>> GetColumns()

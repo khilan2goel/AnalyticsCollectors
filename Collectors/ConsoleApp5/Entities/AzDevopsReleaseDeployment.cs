@@ -11,11 +11,11 @@ namespace AzureDataExplorer
     {
         private ReleaseRestAPIProvider _releaseRestApiProvider;
         private string db = "axexperiments";
-        private string table = "ReleaseDeployment2";
-        private string mappingName = "ReleaseDeployment_mapping_23";
+        private string table = "ReleaseDeployment";
+        private string mappingName = "ReleaseDeployment_mapping_2";
         private string organizationName;
         private string projectId;
-        private int BatchSize = 10000;
+        private int batchSize = 10000;
 
         public AzDevopsReleaseDeployment(ReleaseRestAPIProvider releaseRestApiProvider, string serviceNameAndRegion, string authority, string organizationName, string projectId)
             : base(serviceNameAndRegion, authority)
@@ -78,7 +78,7 @@ namespace AzureDataExplorer
                     writer.WriteLine(JsonConvert.SerializeObject(jObject));
                 }
 
-            } while (continuationToken != 0 && count <= 10);
+            } while (continuationToken != 0 && count <= batchSize);
         }
 
         protected override List<Tuple<string, string>> GetColumns()

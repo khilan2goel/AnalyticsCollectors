@@ -16,6 +16,7 @@ namespace AzureDataExplorer
         private readonly string mappingName = "ReleaseArtifact_mapping_2";
         private readonly string organizationName;
         private readonly string projectId;
+        private int BatchSize = 10000;
 
         public AzDevopsReleaseArtifact(ReleaseRestAPIProvider releaseRestApiProvider, string serviceNameAndRegion, string authority, string organizationName, string projectId)
             : base(serviceNameAndRegion, authority)
@@ -82,7 +83,7 @@ namespace AzureDataExplorer
                     }
                 }
 
-            } while (continuationToken != 0 && count <= 2000);
+            } while (continuationToken != 0 && count <= BatchSize);
         }
 
         protected override List<Tuple<string, string>> GetColumns()
