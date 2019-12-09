@@ -38,8 +38,7 @@ namespace AnalyticsCollector
             var axAzDevopsWaterMark = new AzDevopsWaterMark(clusterNameAndRegion, authority, organizationName, projectId);
             //var axAzDevopsAgentJobRequestsIngestor = new AzDevopsAgentJobRequests(agentJobRequestAPIProvider, clusterNameAndRegion, authority, organizationName, projectId);
 
-            Parallel.Invoke(() => azDevopReleaseDefinitionIngestor.IngestData(axAzDevopsWaterMark), 
-                () => azDevopReleaseDefinitionIngestor.IngestData(axAzDevopsWaterMark),
+            Parallel.Invoke(() => azDevopReleaseDefinitionIngestor.IngestData(axAzDevopsWaterMark),
             () => azDevopsDeploymentIngestor.IngestData(axAzDevopsWaterMark),
             () => azDevopsReleaseIngestor.IngestData(axAzDevopsWaterMark),
             () => azDevopsArtifactIngestor.IngestData(axAzDevopsWaterMark),
