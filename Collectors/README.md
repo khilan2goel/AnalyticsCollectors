@@ -15,4 +15,4 @@
    - ProjectName for Azure Devops (eg - AzureDevops)
 
 * Binaries for each assembly are produced in the
-`AnalyticsCollectors/Collectors/AnalyticsCollector/bin/Debug` directory.
+`AnalyticsCollectors/Collectors/AnalyticsCollector/bin/Debug` directory. We can invoke exe generated in this folder using command line arguments as well.
