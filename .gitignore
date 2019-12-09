@@ -1,0 +1,5 @@
+.vs/
+Collectors/packages
+Collectors/AzureDataExplorer/bin
+Collectors/AzureDataExplorer/obj
+*.*proj.user

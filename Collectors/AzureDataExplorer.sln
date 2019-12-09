@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2050
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureDataExplorer", "ConsoleApp5\AzureDataExplorer.csproj", "{53D1D6D3-129B-4845-9705-B337077F53D5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureDataExplorer", "AzureDataExplorer\AzureDataExplorer.csproj", "{53D1D6D3-129B-4845-9705-B337077F53D5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3B89D460-C732-47F0-8761-A2CF20BE6A33}"
 EndProject
