@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.ReleaseManagement.WebApi.Clients;
@@ -17,13 +18,13 @@ namespace AnalyticsCollector
             string projectName = args[5]; //"AzureDevops";
 
             ReleaseHttpClient releaseHttpClient = new ReleaseHttpClient(new Uri($"https://vsrm.dev.azure.com/{organizationName}"),
-                new VssCredentials(new VssBasicCredential(alias,token)));
+                new VssCredentials(new VssBasicCredential(alias, token)));
 
             ProjectHttpClient projectHttpClient = new ProjectHttpClient(new Uri($"https://dev.azure.com/{organizationName}"),
                 new VssCredentials(new VssBasicCredential(alias, token)));
 
             var azDevopsReleaseProvider = new ReleaseRestAPIProvider(alias, token, releaseHttpClient, projectName);
-           // var agentJobRequestAPIProvider = new AgentJobRequestAPIProvider(alias, token);
+            // var agentJobRequestAPIProvider = new AgentJobRequestAPIProvider(alias, token);
             var azDevopsProjectsProvider = new ProjectRestAPIProvider(projectHttpClient, projectName);
 
             var projectId = azDevopsProjectsProvider.GetProjectInfo(projectName).Id.ToString();
@@ -37,12 +38,13 @@ namespace AnalyticsCollector
             var axAzDevopsWaterMark = new AzDevopsWaterMark(clusterNameAndRegion, authority, organizationName, projectId);
             //var axAzDevopsAgentJobRequestsIngestor = new AzDevopsAgentJobRequests(agentJobRequestAPIProvider, clusterNameAndRegion, authority, organizationName, projectId);
 
-            azDevopReleaseDefinitionIngestor.IngestData(axAzDevopsWaterMark);
-            azDevopsDeploymentIngestor.IngestData(axAzDevopsWaterMark);
-            azDevopsReleaseIngestor.IngestData(axAzDevopsWaterMark);
-            azDevopsArtifactIngestor.IngestData(axAzDevopsWaterMark);
-            azDevopsReleaseEnvironmentIngestor.IngestData(axAzDevopsWaterMark);
-            azDevopsReleaseTimelineRecordIngestor.IngestData(axAzDevopsWaterMark);
+            Parallel.Invoke(() => azDevopReleaseDefinitionIngestor.IngestData(axAzDevopsWaterMark), 
+                () => azDevopReleaseDefinitionIngestor.IngestData(axAzDevopsWaterMark),
+            () => azDevopsDeploymentIngestor.IngestData(axAzDevopsWaterMark),
+            () => azDevopsReleaseIngestor.IngestData(axAzDevopsWaterMark),
+            () => azDevopsArtifactIngestor.IngestData(axAzDevopsWaterMark),
+            () => azDevopsReleaseEnvironmentIngestor.IngestData(axAzDevopsWaterMark),
+            () => azDevopsReleaseTimelineRecordIngestor.IngestData(axAzDevopsWaterMark));
         }
     }
 }
