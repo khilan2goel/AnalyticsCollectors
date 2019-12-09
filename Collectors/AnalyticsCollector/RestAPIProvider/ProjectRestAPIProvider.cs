@@ -1,6 +1,6 @@
 ﻿using Microsoft.TeamFoundation.Core.WebApi;
 
-namespace AzureDataExplorer
+namespace AnalyticsCollector
 {
     public class ProjectRestAPIProvider
     {

@@ -4,7 +4,7 @@ using System.IO;
 using Kusto.Data.Common;
 using Newtonsoft.Json;
 
-namespace AzureDataExplorer
+namespace AnalyticsCollector
 {
     public class AzDevopsAgentJobRequests : AzureDataExplorerService
     {

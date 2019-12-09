@@ -5,7 +5,7 @@ using Kusto.Data.Common;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace AzureDataExplorer
+namespace AnalyticsCollector
 {
     public class AzDevopsReleaseDefinition : AzureDataExplorerService
     {

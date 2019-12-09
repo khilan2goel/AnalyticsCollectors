@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Net.Http;
 
-namespace AzureDataExplorer
+namespace AnalyticsCollector
 {
     public class HttpRestAPIProvider
     {

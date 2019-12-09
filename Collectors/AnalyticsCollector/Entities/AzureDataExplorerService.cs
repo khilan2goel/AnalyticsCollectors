@@ -9,7 +9,7 @@ using Kusto.Data.Common;
 using Kusto.Data.Net.Client;
 using Kusto.Ingest;
 
-namespace AzureDataExplorer
+namespace AnalyticsCollector
 {
     public abstract class AzureDataExplorerService
     {

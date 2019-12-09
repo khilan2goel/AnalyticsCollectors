@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.Services.ReleaseManagement.WebApi.Contracts;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace AzureDataExplorer
+namespace AnalyticsCollector
 {
     public class AzDevopsRelease : AzureDataExplorerService
     {

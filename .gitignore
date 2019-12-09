@@ -1,5 +1,5 @@
 .vs/
 Collectors/packages
-Collectors/AzureDataExplorer/bin
-Collectors/AzureDataExplorer/obj
+Collectors/AnalyticsCollector/bin
+Collectors/AnalyticsCollector/obj
 *.*proj.user

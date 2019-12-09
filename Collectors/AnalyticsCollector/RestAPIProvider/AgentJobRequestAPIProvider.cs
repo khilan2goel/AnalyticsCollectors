@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
-namespace AzureDataExplorer
+namespace AnalyticsCollector
 {
     public class AgentJobRequestAPIProvider : HttpRestAPIProvider
     {

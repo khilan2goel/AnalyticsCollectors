@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Kusto.Data.Common;
 
-namespace AzureDataExplorer
+namespace AnalyticsCollector
 {
     public class AzDevopsWaterMark : AzureDataExplorerService
     {

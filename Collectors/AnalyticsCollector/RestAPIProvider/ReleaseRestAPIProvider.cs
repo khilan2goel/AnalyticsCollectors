@@ -11,7 +11,7 @@ using Microsoft.VisualStudio.Services.ReleaseManagement.WebApi.Contracts;
 using Microsoft.VisualStudio.Services.WebApi;
 using Newtonsoft.Json.Linq;
 
-namespace AzureDataExplorer
+namespace AnalyticsCollector
 {
     public class ReleaseRestAPIProvider : HttpRestAPIProvider
     {
