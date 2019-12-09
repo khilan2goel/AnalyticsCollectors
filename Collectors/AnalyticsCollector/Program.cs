@@ -38,12 +38,17 @@ namespace AnalyticsCollector
             var axAzDevopsWaterMark = new AzDevopsWaterMark(clusterNameAndRegion, authority, organizationName, projectId);
             //var axAzDevopsAgentJobRequestsIngestor = new AzDevopsAgentJobRequests(agentJobRequestAPIProvider, clusterNameAndRegion, authority, organizationName, projectId);
 
-            Parallel.Invoke(() => azDevopReleaseDefinitionIngestor.IngestData(axAzDevopsWaterMark),
+            Console.WriteLine("Igestion started for Release Entities");
+
+            Parallel.Invoke(
+            () => azDevopReleaseDefinitionIngestor.IngestData(axAzDevopsWaterMark),
             () => azDevopsDeploymentIngestor.IngestData(axAzDevopsWaterMark),
             () => azDevopsReleaseIngestor.IngestData(axAzDevopsWaterMark),
             () => azDevopsArtifactIngestor.IngestData(axAzDevopsWaterMark),
             () => azDevopsReleaseEnvironmentIngestor.IngestData(axAzDevopsWaterMark),
             () => azDevopsReleaseTimelineRecordIngestor.IngestData(axAzDevopsWaterMark));
+
+            Console.WriteLine("Igestion completed");
         }
     }
 }

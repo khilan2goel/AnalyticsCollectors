@@ -70,7 +70,7 @@ namespace AnalyticsCollector
 
                     if (existingTables.Contains(table))
                     {
-                        Console.WriteLine($"Table {table} alreay exists");
+                        Console.WriteLine($"Table {table} already exists");
                         return;
                     }
 

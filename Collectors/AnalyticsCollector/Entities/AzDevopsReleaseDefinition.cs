@@ -47,9 +47,22 @@ namespace AnalyticsCollector
             azureAzDevopsWaterMark.UpdateWaterMark(_table, waterMark);
         }
 
+        // Release Definition doesn't change much. If already igested once, dont ingest again.
         private void WriteData(StreamWriter writer, string waterMark, out int continuationTokenOutput)
         {
             TryParseWaterMark(waterMark, out int continuationToken);
+
+            if (continuationToken == 0)
+            {
+                Console.WriteLine("ReleaseDefinition table already ingested once. Not ingesting again.");
+                continuationTokenOutput = 0;
+                return;
+            }
+            else if (continuationToken == -1)
+            {
+                continuationToken = 0;
+            }
+
             int count = 0;
             do
             {
@@ -158,7 +171,7 @@ namespace AnalyticsCollector
 
         private static bool TryParseWaterMark(string waterMark, out int continuationToken)
         {
-            continuationToken = 0;
+            continuationToken = -1;
 
             if (!string.IsNullOrWhiteSpace(waterMark))
             {
