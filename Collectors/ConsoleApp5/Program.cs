@@ -9,46 +9,40 @@ namespace AzureDataExplorer
     {
         static void Main(string[] args)
         {
-            //string username = args[0];
-            //string password = args[1];
-            //string clientId = args[2];
-            //string clientSecret = args[3];
-            //string projectName = args[4];
-            //string organizationName = args[5];
+            string alias = args[0]; // "user@microsoft.com";
+            string token = args[1]; //"PAT_TOKEN";
+            string serviceNameAndRegion = args[2]; //"axexperiments.southeastasia";
+            string authority = args[3]; //"microsoft.com";
+            string organizationName = args[4]; //"mseng";
+            string projectName = args[5]; //"AzureDevops";
 
-            string alias = "user@microsoft.com";
-            string token = "PAT_TOKEN";
-            string serviceNameAndRegion = "axexperiments.southeastasia";
-            string authority = "microsoft.com";
-
-            ReleaseHttpClient releaseHttpClient = new ReleaseHttpClient(new Uri("https://vsrm.dev.azure.com/mseng"),
+            ReleaseHttpClient releaseHttpClient = new ReleaseHttpClient(new Uri($"https://vsrm.dev.azure.com/{organizationName}"),
                 new VssCredentials(new VssBasicCredential(alias,token)));
 
-            ProjectHttpClient projectHttpClient = new ProjectHttpClient(new Uri("https://dev.azure.com/mseng"),
+            ProjectHttpClient projectHttpClient = new ProjectHttpClient(new Uri($"https://dev.azure.com/{organizationName}"),
                 new VssCredentials(new VssBasicCredential(alias, token)));
 
-            var azDevopsReleaseProvider = new ReleaseRestAPIProvider(alias, token, releaseHttpClient, "AzureDevops");
+            var azDevopsReleaseProvider = new ReleaseRestAPIProvider(alias, token, releaseHttpClient, projectName);
             var agentJobRequestAPIProvider = new AgentJobRequestAPIProvider(alias, token);
-            var azDevopsProjectsProvider = new ProjectRestAPIProvider(projectHttpClient, "AzureDevops");
+            var azDevopsProjectsProvider = new ProjectRestAPIProvider(projectHttpClient, projectName);
 
-            var projectId = azDevopsProjectsProvider.GetProjectInfo("AzureDevops").Id.ToString();
+            var projectId = azDevopsProjectsProvider.GetProjectInfo(projectName).Id.ToString();
 
-            //var azDevopsDeploymentIngestor = new AzDevopsReleaseDeployment(azDevopsReleaseProvider, serviceNameAndRegion, authority, "mseng", projectId);
-            //var azDevopsArtifactIngestor = new AzDevopsReleaseArtifact(azDevopsReleaseProvider, serviceNameAndRegion, authority, "mseng", projectId);
-            //var azDevopReleaseDefinitionIngestor = new AzDevopsReleaseDefinition(azDevopsReleaseProvider, serviceNameAndRegion, authority, "mseng", projectId);
-            //var azDevopsReleaseIngestor = new AzDevopsRelease(azDevopsReleaseProvider, serviceNameAndRegion, authority, "mseng", projectId);
-            //var azDevopsReleaseEnvironmentIngestor = new AzDevopsReleaseEnvironment(azDevopsReleaseProvider, serviceNameAndRegion, authority, "mseng", projectId);
-            //var azDevopsReleaseTimelineRecordIngestor = new AzDevopsReleaseTimelineRecord(azDevopsReleaseProvider, serviceNameAndRegion, authority, "mseng", projectId);
-            //var axAzDevopsWaterMark = new AzDevopsWaterMark(serviceNameAndRegion, authority, "mseng", projectId);
-            var azDevopsReleaseTimelineRecordIngestor2 = new AzDevopsAgentJobRequests(agentJobRequestAPIProvider, serviceNameAndRegion, authority, "mseng", projectId);
+            var azDevopsDeploymentIngestor = new AzDevopsReleaseDeployment(azDevopsReleaseProvider, serviceNameAndRegion, authority, organizationName, projectId);
+            var azDevopsArtifactIngestor = new AzDevopsReleaseArtifact(azDevopsReleaseProvider, serviceNameAndRegion, authority, organizationName, projectId);
+            var azDevopReleaseDefinitionIngestor = new AzDevopsReleaseDefinition(azDevopsReleaseProvider, serviceNameAndRegion, authority, organizationName, projectId);
+            var azDevopsReleaseIngestor = new AzDevopsRelease(azDevopsReleaseProvider, serviceNameAndRegion, authority, organizationName, projectId);
+            var azDevopsReleaseEnvironmentIngestor = new AzDevopsReleaseEnvironment(azDevopsReleaseProvider, serviceNameAndRegion, authority, organizationName, projectId);
+            var azDevopsReleaseTimelineRecordIngestor = new AzDevopsReleaseTimelineRecord(azDevopsReleaseProvider, serviceNameAndRegion, authority, organizationName, projectId);
+            var axAzDevopsWaterMark = new AzDevopsWaterMark(serviceNameAndRegion, authority, organizationName, projectId);
+            var axAzDevopsAgentJobRequestsIngestor = new AzDevopsAgentJobRequests(agentJobRequestAPIProvider, serviceNameAndRegion, authority, organizationName, projectId);
 
-
-            //azDevopReleaseDefinitionIngestor.IngestData(axAzDevopsWaterMark);
-            //azDevopsDeploymentIngestor.IngestData(axAzDevopsWaterMark);
-            azDevopsReleaseTimelineRecordIngestor2.IngestData(676);
-            //azDevopsReleaseIngestor.IngestData(axAzDevopsWaterMark);
-            //azDevopsArtifactIngestor.IngestData(axAzDevopsWaterMark);
-            //azDevopsReleaseTimelineRecordIngestor.IngestData(axAzDevopsWaterMark);
+            azDevopReleaseDefinitionIngestor.IngestData(axAzDevopsWaterMark);
+            azDevopsDeploymentIngestor.IngestData(axAzDevopsWaterMark);
+            azDevopsReleaseIngestor.IngestData(axAzDevopsWaterMark);
+            azDevopsArtifactIngestor.IngestData(axAzDevopsWaterMark);
+            azDevopsReleaseEnvironmentIngestor.IngestData(axAzDevopsWaterMark);
+            azDevopsReleaseTimelineRecordIngestor.IngestData(axAzDevopsWaterMark);
         }
     }
 }
