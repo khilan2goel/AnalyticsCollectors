@@ -14,11 +14,11 @@ namespace AnalyticsCollector
         private string organizationName;
         private string projectId;
 
-        public AzDevopsWaterMark(string serviceNameAndRegion, string aadTenantIdOrTenantName, string organization, string projectId)
-            : base(serviceNameAndRegion, aadTenantIdOrTenantName)
+        public AzDevopsWaterMark(string kustoConnectionString, string aadTenantIdOrTenantName, string organization, string projectId)
+            : base(kustoConnectionString, aadTenantIdOrTenantName)
         {
-            this.CreateTableIfNotExists(db, table, mappingName);
             this.CreateDatabaseIfNotExists(db);
+            this.CreateTableIfNotExists(db, table, mappingName);
             this.organizationName = organization;
             this.projectId = projectId;
         }

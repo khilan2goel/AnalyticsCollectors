@@ -13,13 +13,13 @@ namespace AnalyticsCollector
 {
     public abstract class AzureDataExplorerService
     {
-        private string serviceNameAndRegion;
-        private string authority;
+        private string _kustoConnectionString;
+        private string _aadTenantIdOrTenantName;
 
-        protected AzureDataExplorerService(string serviceNameAndRegion, string authority)
+        protected AzureDataExplorerService(string kustoConnectionString, string _aadTenantIdOrTenantName)
         {
-            this.serviceNameAndRegion = serviceNameAndRegion; 
-            this.authority = authority; 
+            this._kustoConnectionString = kustoConnectionString; 
+            this._aadTenantIdOrTenantName = _aadTenantIdOrTenantName; 
         }
 
         protected abstract List<Tuple<string, string>> GetColumns();
@@ -30,7 +30,7 @@ namespace AnalyticsCollector
         {
             // Create Ingest Client
             var kcsbDM =
-                new KustoConnectionStringBuilder($"https://ingest-{serviceNameAndRegion}.kusto.windows.net").WithAadUserPromptAuthentication(authority: $"{authority}");
+                new KustoConnectionStringBuilder($"https://ingest-{_kustoConnectionString}").WithAadUserPromptAuthentication(authority: $"{_aadTenantIdOrTenantName}");
 
             using (var ingestClient = KustoIngestFactory.CreateQueuedIngestClient(kcsbDM))
             {
@@ -59,8 +59,8 @@ namespace AnalyticsCollector
             {
                 // Set up table
                 var kcsbEngine =
-                    new KustoConnectionStringBuilder($"https://{this.serviceNameAndRegion}.kusto.windows.net")
-                        .WithAadUserPromptAuthentication(authority: $"{authority}");
+                    new KustoConnectionStringBuilder($"https://{this._kustoConnectionString}")
+                        .WithAadUserPromptAuthentication(authority: $"{_aadTenantIdOrTenantName}");
 
                 using (var kustoAdminClient = KustoClientFactory.CreateCslAdminProvider(kcsbEngine))
                 {
@@ -90,11 +90,46 @@ namespace AnalyticsCollector
             }
         }
 
+        public void CreateDatabaseIfNotExists(string db)
+        {
+            try
+            {
+                // Set up Database
+                var kcsbEngine =
+                    new KustoConnectionStringBuilder($"https://{this._kustoConnectionString}")
+                        .WithAadUserPromptAuthentication(authority: $"{_aadTenantIdOrTenantName}");
+
+                using (var kustoAdminClient = KustoClientFactory.CreateCslAdminProvider(kcsbEngine))
+                {
+                    // check if database already exists.
+                    var showDatabasesCommands = CslCommandGenerator.GenerateDatabasesShowCommand();
+                    var existingDatabase =
+                        kustoAdminClient.ExecuteControlCommand<DatabasesShowCommandResult>(showDatabasesCommands).Select(x => x.DatabaseName).ToList();
+
+                    if (existingDatabase.Contains("axexperiments2"))
+                    {
+                        Console.WriteLine($"Database {db} already exists");
+                    }
+                    else
+                    {
+                        // Create Columns
+                        var command = CslCommandGenerator.GenerateDatabaseCreateCommand("axexperiments2", false, new List<string>(), false);
+                        kustoAdminClient.ExecuteControlCommand(db, command);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Cannot create database due to {0}", ex);
+                throw;
+            }
+        }
+
         public IEnumerable<IDictionary<string, object>> ExecuteQuery(string db, string query, Dictionary<string, string> queryParameters)
         {
             var kcsbEngine =
-                new KustoConnectionStringBuilder($"https://{this.serviceNameAndRegion}.kusto.windows.net")
-                    .WithAadUserPromptAuthentication(authority: $"{authority}");
+                new KustoConnectionStringBuilder($"https://{this._kustoConnectionString}")
+                    .WithAadUserPromptAuthentication(authority: $"{_aadTenantIdOrTenantName}");
 
             var clientRequestProperties = new ClientRequestProperties(
                 options: null,
