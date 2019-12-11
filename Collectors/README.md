@@ -10,7 +10,7 @@
    - alias (eg - user@microsoft.com for AzureDevops organization)
    - token (eg - PAT_TOKEN for AzureDevops organization)
    - clusterNameAndRegion for Azure Data explorer (eg - axexperiments.southeastasia ) 
-   - AuthorityName for making Azure Data explorer AAD connection (eg - microsoft.com)
+   - aadTenantIdOrTenantName for making Azure Data explorer AAD connection either AAD tenant GUID or AAD domain name (eg - microsoft.com)
    - OrganizationName for Azure Devops (eg - mseng)
    - ProjectName for Azure Devops (eg - AzureDevops)
 
