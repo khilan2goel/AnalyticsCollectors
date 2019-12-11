@@ -13,7 +13,7 @@ namespace AnalyticsCollector
             string alias = args[0]; // "user@microsoft.com";
             string token = args[1]; //"PAT_TOKEN";
             string clusterNameAndRegion = args[2]; //"axexperiments.southeastasia";
-            string authority = args[3]; //"microsoft.com";
+            string aadTenantIdOrTenantName = args[3]; //"microsoft.com" or tenant GUID;
             string organizationName = args[4]; //"mseng";
             string projectName = args[5]; //"AzureDevops";
 
@@ -29,13 +29,16 @@ namespace AnalyticsCollector
 
             var projectId = azDevopsProjectsProvider.GetProjectInfo(projectName).Id.ToString();
 
-            var azDevopsDeploymentIngestor = new AzDevopsReleaseDeployment(azDevopsReleaseProvider, clusterNameAndRegion, authority, organizationName, projectId);
-            var azDevopsArtifactIngestor = new AzDevopsReleaseArtifact(azDevopsReleaseProvider, clusterNameAndRegion, authority, organizationName, projectId);
-            var azDevopReleaseDefinitionIngestor = new AzDevopsReleaseDefinition(azDevopsReleaseProvider, clusterNameAndRegion, authority, organizationName, projectId);
-            var azDevopsReleaseIngestor = new AzDevopsRelease(azDevopsReleaseProvider, clusterNameAndRegion, authority, organizationName, projectId);
-            var azDevopsReleaseEnvironmentIngestor = new AzDevopsReleaseEnvironment(azDevopsReleaseProvider, clusterNameAndRegion, authority, organizationName, projectId);
-            var azDevopsReleaseTimelineRecordIngestor = new AzDevopsReleaseTimelineRecord(azDevopsReleaseProvider, clusterNameAndRegion, authority, organizationName, projectId);
-            var axAzDevopsWaterMark = new AzDevopsWaterMark(clusterNameAndRegion, authority, organizationName, projectId);
+            // This is used for by each entity. It takes care of creating database as well if it doesn't exist.
+            // TODO: Remove this dependency
+            var axAzDevopsWaterMark = new AzDevopsWaterMark(clusterNameAndRegion, aadTenantIdOrTenantName, organizationName, projectId);
+
+            var azDevopsDeploymentIngestor = new AzDevopsReleaseDeployment(azDevopsReleaseProvider, clusterNameAndRegion, aadTenantIdOrTenantName, organizationName, projectId);
+            var azDevopsArtifactIngestor = new AzDevopsReleaseArtifact(azDevopsReleaseProvider, clusterNameAndRegion, aadTenantIdOrTenantName, organizationName, projectId);
+            var azDevopReleaseDefinitionIngestor = new AzDevopsReleaseDefinition(azDevopsReleaseProvider, clusterNameAndRegion, aadTenantIdOrTenantName, organizationName, projectId);
+            var azDevopsReleaseIngestor = new AzDevopsRelease(azDevopsReleaseProvider, clusterNameAndRegion, aadTenantIdOrTenantName, organizationName, projectId);
+            var azDevopsReleaseEnvironmentIngestor = new AzDevopsReleaseEnvironment(azDevopsReleaseProvider, clusterNameAndRegion, aadTenantIdOrTenantName, organizationName, projectId);
+            var azDevopsReleaseTimelineRecordIngestor = new AzDevopsReleaseTimelineRecord(azDevopsReleaseProvider, clusterNameAndRegion, aadTenantIdOrTenantName, organizationName, projectId);
             //var axAzDevopsAgentJobRequestsIngestor = new AzDevopsAgentJobRequests(agentJobRequestAPIProvider, clusterNameAndRegion, authority, organizationName, projectId);
 
             Console.WriteLine("Igestion started for Release Entities");

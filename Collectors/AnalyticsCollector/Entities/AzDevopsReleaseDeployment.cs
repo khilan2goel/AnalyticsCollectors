@@ -17,8 +17,8 @@ namespace AnalyticsCollector
         private string projectId;
         private int batchSize = 10000;
 
-        public AzDevopsReleaseDeployment(ReleaseRestAPIProvider releaseRestApiProvider, string serviceNameAndRegion, string authority, string organizationName, string projectId)
-            : base(serviceNameAndRegion, authority)
+        public AzDevopsReleaseDeployment(ReleaseRestAPIProvider releaseRestApiProvider, string serviceNameAndRegion, string aadTenantIdOrTenantName, string organizationName, string projectId)
+            : base(serviceNameAndRegion, aadTenantIdOrTenantName)
         {
             _releaseRestApiProvider = releaseRestApiProvider;
             this.organizationName = organizationName;

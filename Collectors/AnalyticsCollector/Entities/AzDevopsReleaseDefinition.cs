@@ -17,8 +17,8 @@ namespace AnalyticsCollector
         private readonly string _projectId;
         private int BatchSize = 10000;
 
-        public AzDevopsReleaseDefinition(ReleaseRestAPIProvider releaseRestApiProvider, string serviceNameAndRegion, string authority, string organizationName, string projectId)
-            : base(serviceNameAndRegion, authority)
+        public AzDevopsReleaseDefinition(ReleaseRestAPIProvider releaseRestApiProvider, string serviceNameAndRegion, string aadTenantIdOrTenantName, string organizationName, string projectId)
+            : base(serviceNameAndRegion, aadTenantIdOrTenantName)
         {
             this._releaseRestApiProvider = releaseRestApiProvider;
             this._organizationName = organizationName;
@@ -54,7 +54,7 @@ namespace AnalyticsCollector
 
             if (continuationToken == 0)
             {
-                Console.WriteLine("ReleaseDefinition table already ingested once. Not ingesting again.");
+                Console.WriteLine("ReleaseDefinition table already ingested once. Not ingesting again as this table doesnt change much.");
                 continuationTokenOutput = 0;
                 return;
             }
