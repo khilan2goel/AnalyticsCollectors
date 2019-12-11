@@ -236,7 +236,7 @@
     <Compile Include="RestAPIProvider\HttpRestAPIProvider.cs" />
     <Compile Include="RestAPIProvider\ProjectRestAPIProvider.cs" />
     <Compile Include="RestAPIProvider\ReleaseRestAPIProvider.cs" />
-    <Compile Include="Entities\AzureDataExplorerService.cs" />
+    <Compile Include="KustoService\AzureDataExplorerService.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
