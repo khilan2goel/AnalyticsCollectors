@@ -106,14 +106,14 @@ namespace AnalyticsCollector
                     var existingDatabase =
                         kustoAdminClient.ExecuteControlCommand<DatabasesShowCommandResult>(showDatabasesCommands).Select(x => x.DatabaseName).ToList();
 
-                    if (existingDatabase.Contains("axexperiments2"))
+                    if (existingDatabase.Contains(db))
                     {
                         Console.WriteLine($"Database {db} already exists");
                     }
                     else
                     {
                         // Create Columns
-                        var command = CslCommandGenerator.GenerateDatabaseCreateCommand("axexperiments2", false, new List<string>(), false);
+                        var command = CslCommandGenerator.GenerateDatabaseCreateCommand(db, false, new List<string>(), false);
                         kustoAdminClient.ExecuteControlCommand(db, command);
                     }
                 }
