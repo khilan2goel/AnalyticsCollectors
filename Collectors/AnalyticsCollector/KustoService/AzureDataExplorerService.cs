@@ -90,41 +90,6 @@ namespace AnalyticsCollector
             }
         }
 
-        public void CreateDatabaseIfNotExists(string db)
-        {
-            try
-            {
-                // Set up Database
-                var kcsbEngine =
-                    new KustoConnectionStringBuilder($"https://{this._kustoConnectionString}")
-                        .WithAadUserPromptAuthentication(authority: $"{_aadTenantIdOrTenantName}");
-
-                using (var kustoAdminClient = KustoClientFactory.CreateCslAdminProvider(kcsbEngine))
-                {
-                    // check if database already exists.
-                    var showDatabasesCommands = CslCommandGenerator.GenerateDatabasesShowCommand();
-                    var existingDatabase =
-                        kustoAdminClient.ExecuteControlCommand<DatabasesShowCommandResult>(showDatabasesCommands).Select(x => x.DatabaseName).ToList();
-
-                    if (existingDatabase.Contains(db))
-                    {
-                        Console.WriteLine($"Database {db} already exists");
-                    }
-                    else
-                    {
-                        // Create Columns
-                        var command = CslCommandGenerator.GenerateDatabaseCreateCommand(db, false, new List<string>(), false);
-                        kustoAdminClient.ExecuteControlCommand(db, command);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Cannot create database due to {0}", ex);
-                throw;
-            }
-        }
-
         public IEnumerable<IDictionary<string, object>> ExecuteQuery(string db, string query, Dictionary<string, string> queryParameters)
         {
             var kcsbEngine =

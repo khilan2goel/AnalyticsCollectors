@@ -17,7 +17,6 @@ namespace AnalyticsCollector
         public AzDevopsWaterMark(string kustoConnectionString, string aadTenantIdOrTenantName, string organization, string projectId)
             : base(kustoConnectionString, aadTenantIdOrTenantName)
         {
-            this.CreateDatabaseIfNotExists(db);
             this.CreateTableIfNotExists(db, table, mappingName);
             this.organizationName = organization;
             this.projectId = projectId;

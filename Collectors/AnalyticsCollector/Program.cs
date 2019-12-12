@@ -29,10 +29,7 @@ namespace AnalyticsCollector
 
             var projectId = azDevopsProjectsProvider.GetProjectInfo(projectName).Id.ToString();
 
-            // This is used for by each entity. It takes care of creating database as well if it doesn't exist.
-            // TODO: Remove this dependency
             var axAzDevopsWaterMark = new AzDevopsWaterMark(kustoConnectionString, aadTenantIdOrTenantName, organizationName, projectId);
-
             var azDevopsDeploymentIngestor = new AzDevopsReleaseDeployment(azDevopsReleaseProvider, kustoConnectionString, aadTenantIdOrTenantName, organizationName, projectId);
             var azDevopsArtifactIngestor = new AzDevopsReleaseArtifact(azDevopsReleaseProvider, kustoConnectionString, aadTenantIdOrTenantName, organizationName, projectId);
             var azDevopReleaseDefinitionIngestor = new AzDevopsReleaseDefinition(azDevopsReleaseProvider, kustoConnectionString, aadTenantIdOrTenantName, organizationName, projectId);
