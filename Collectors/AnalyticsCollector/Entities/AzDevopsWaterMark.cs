@@ -8,7 +8,6 @@ namespace AnalyticsCollector
 {
     public class AzDevopsWaterMark : AzureDataExplorerService
     {
-        private readonly string db;
         private readonly string table = "WaterMarkTable";
         private readonly string mappingName = "WaterMark_mapping_2";
         private string organizationName;
@@ -17,8 +16,7 @@ namespace AnalyticsCollector
         public AzDevopsWaterMark(string kustoConnectionString, string aadTenantIdOrTenantName, string organization, string projectId)
             : base(kustoConnectionString, aadTenantIdOrTenantName)
         {
-            this.db = GetDatabaseName();
-            this.CreateTableIfNotExists(db, table, mappingName);
+            this.CreateTableIfNotExists(table, mappingName);
             this.organizationName = organization;
             this.projectId = projectId;
         }
@@ -33,7 +31,7 @@ namespace AnalyticsCollector
             };
             string query = $"WaterMarkTable | where OrganizationName == '{organizationName}' | where ProjectId == '{this.projectId}' | where EntityName == '{entityName}' | order by TimeStamp desc | project WaterMarkValue | take 1";
 
-            var result = this.ExecuteQuery(this.db, query, parameter);
+            var result = this.ExecuteQuery(query, parameter);
             return result.FirstOrDefault()?.Values.FirstOrDefault()?.ToString();
         }
 
@@ -48,7 +46,7 @@ namespace AnalyticsCollector
                 writer.Flush();
                 memStream.Seek(0, SeekOrigin.Begin);
 
-                this.IngestData(db, table, mappingName, memStream);
+                this.IngestData(table, mappingName, memStream);
             }
         }
 

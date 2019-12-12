@@ -10,7 +10,6 @@ namespace AnalyticsCollector
     public class AzDevopsReleaseDeployment : AzureDataExplorerService
     {
         private ReleaseRestAPIProvider _releaseRestApiProvider;
-        private readonly string db;
         private string table = "ReleaseDeployment";
         private string mappingName = "ReleaseDeployment_mapping_2";
         private string organizationName;
@@ -23,8 +22,7 @@ namespace AnalyticsCollector
             _releaseRestApiProvider = releaseRestApiProvider;
             this.organizationName = organizationName;
             this.projectId = projectId;
-            this.db = GetDatabaseName();
-            CreateTableIfNotExists(db, table, mappingName);
+            CreateTableIfNotExists(table, mappingName);
         }
 
         public void IngestData(AzDevopsWaterMark azureAzDevopsWaterMark)
@@ -42,7 +40,7 @@ namespace AnalyticsCollector
                 writer.Flush();
                 memStream.Seek(0, SeekOrigin.Begin);
 
-                this.IngestData(db, table, mappingName, memStream);
+                this.IngestData(table, mappingName, memStream);
             }
 
             waterMark = string.Format("{0},{1}", continuationToken, minModifiedDate);

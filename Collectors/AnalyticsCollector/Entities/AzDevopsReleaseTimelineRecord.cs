@@ -11,7 +11,6 @@ namespace AnalyticsCollector
     public class AzDevopsReleaseTimelineRecord : AzureDataExplorerService
     {
         private ReleaseRestAPIProvider _releaseRestApiProvider;
-        private readonly string db;
         private readonly string table = "ReleaseTimelineRecord";
         private readonly string mappingName = "ReleaseTimelineRecord_mapping_2";
         private readonly string organizationName;
@@ -24,8 +23,7 @@ namespace AnalyticsCollector
             this.organizationName = organizationName;
             this.projectId = projectId;
             this._releaseRestApiProvider = releaseRestApiProvider;
-            this.db = GetDatabaseName();
-            this.CreateTableIfNotExists(db, table, mappingName);
+            this.CreateTableIfNotExists(table, mappingName);
         }
 
         public void IngestData(AzDevopsWaterMark azureAzDevopsWaterMark)
@@ -43,7 +41,7 @@ namespace AnalyticsCollector
                 writer.Flush();
                 memStream.Seek(0, SeekOrigin.Begin);
 
-                this.IngestData(db, table, mappingName, memStream);
+                this.IngestData(table, mappingName, memStream);
             }
 
             waterMark = string.Format("{0},{1}", continuationToken, minCreatedDateTime);

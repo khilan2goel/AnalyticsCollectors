@@ -15,18 +15,19 @@ namespace AnalyticsCollector
     {
         private string _kustoConnectionString;
         private string _aadTenantIdOrTenantName;
+        private string _databaseName;
 
-        protected AzureDataExplorerService(string kustoConnectionString, string _aadTenantIdOrTenantName)
+        protected AzureDataExplorerService(string kustoConnectionString, string aadTenantIdOrTenantName)
         {
             this._kustoConnectionString = kustoConnectionString; 
-            this._aadTenantIdOrTenantName = _aadTenantIdOrTenantName; 
+            this._aadTenantIdOrTenantName = aadTenantIdOrTenantName;
         }
 
         protected abstract List<Tuple<string, string>> GetColumns();
 
         protected abstract List<JsonColumnMapping> GetJsonColumnMappings();
 
-        public void IngestData(string db, string table, string mappingName, Stream memStream)
+        public void IngestData(string table, string mappingName, Stream memStream)
         {
             // Create Ingest Client
             var kcsbDM =
@@ -34,7 +35,7 @@ namespace AnalyticsCollector
 
             using (var ingestClient = KustoIngestFactory.CreateQueuedIngestClient(kcsbDM))
             {
-                var ingestProps = new KustoQueuedIngestionProperties(db, table);
+                var ingestProps = new KustoQueuedIngestionProperties(DatabaseName, table);
 
                 ingestProps.ReportLevel = IngestionReportLevel.FailuresAndSuccesses;
                 ingestProps.ReportMethod = IngestionReportMethod.Queue;
@@ -53,7 +54,7 @@ namespace AnalyticsCollector
             }
         }
 
-        public void CreateTableIfNotExists(string db, string table, string mappingName)
+        public void CreateTableIfNotExists(string table, string mappingName)
         {
             try
             {
@@ -66,7 +67,7 @@ namespace AnalyticsCollector
                 {
                     // check if already exists.
                     var showTableCommands = CslCommandGenerator.GenerateTablesShowDetailsCommand();
-                    var existingTables = kustoAdminClient.ExecuteControlCommand<IngestionMappingShowCommandResult>(db, showTableCommands).Select( x => x.Name).ToList();
+                    var existingTables = kustoAdminClient.ExecuteControlCommand<IngestionMappingShowCommandResult>(DatabaseName, showTableCommands).Select( x => x.Name).ToList();
 
                     if (existingTables.Contains(table))
                     {
@@ -76,12 +77,12 @@ namespace AnalyticsCollector
 
                     // Create Columns
                     var command = CslCommandGenerator.GenerateTableCreateCommand(table, GetColumns());
-                    kustoAdminClient.ExecuteControlCommand(databaseName: db, command: command);
+                    kustoAdminClient.ExecuteControlCommand(databaseName: DatabaseName, command: command);
 
                     // Create Mapping
                     command = CslCommandGenerator.GenerateTableJsonMappingCreateCommand(
                         table, mappingName, GetJsonColumnMappings());
-                    kustoAdminClient.ExecuteControlCommand(databaseName: db, command: command);
+                    kustoAdminClient.ExecuteControlCommand(databaseName: DatabaseName, command: command);
                 }
             }
             catch (Exception ex)
@@ -90,7 +91,7 @@ namespace AnalyticsCollector
             }
         }
 
-        public IEnumerable<IDictionary<string, object>> ExecuteQuery(string db, string query, Dictionary<string, string> queryParameters)
+        public IEnumerable<IDictionary<string, object>> ExecuteQuery(string query, Dictionary<string, string> queryParameters)
         {
             var kcsbEngine =
                 new KustoConnectionStringBuilder($"https://{this._kustoConnectionString}")
@@ -102,7 +103,7 @@ namespace AnalyticsCollector
 
             using (var client = KustoClientFactory.CreateCslQueryProvider(kcsbEngine))
             {
-                var reader = client.ExecuteQuery(db, query, clientRequestProperties);
+                var reader = client.ExecuteQuery(DatabaseName, query, clientRequestProperties);
 
                 var names = Enumerable.Range(0, reader.FieldCount)
                     .Select(i => reader.GetName(i))
@@ -116,29 +117,38 @@ namespace AnalyticsCollector
             }
         }
 
-        public string GetDatabaseName()
+        public string DatabaseName
         {
-            try
+            get
             {
-                // Set up Database	
-                var kcsbEngine =
-                    new KustoConnectionStringBuilder($"https://{this._kustoConnectionString}")
-                        .WithAadUserPromptAuthentication(authority: $"{_aadTenantIdOrTenantName}");
-
-                using (var kustoAdminClient = KustoClientFactory.CreateCslAdminProvider(kcsbEngine))
+                try
                 {
-                    // check if database already exists.	
-                    var showDatabasesCommands = CslCommandGenerator.GenerateDatabasesShowCommand();
-                    var existingDatabase =
-                        kustoAdminClient.ExecuteControlCommand<DatabasesShowCommandResult>(showDatabasesCommands).Select(x => x.DatabaseName).ToList();
+                    if (string.IsNullOrEmpty(this._databaseName))
+                    {
+                        var kcsbEngine =
+                            new KustoConnectionStringBuilder($"https://{this._kustoConnectionString}")
+                                .WithAadUserPromptAuthentication(authority: $"{_aadTenantIdOrTenantName}");
 
-                    return existingDatabase[0];
+                        using (var kustoAdminClient = KustoClientFactory.CreateCslAdminProvider(kcsbEngine))
+                        {
+                            // get database name
+                            var showDatabasesCommands = CslCommandGenerator.GenerateDatabasesShowCommand();
+                            var existingDatabase =
+                                kustoAdminClient
+                                    .ExecuteControlCommand<DatabasesShowCommandResult>(showDatabasesCommands)
+                                    .Select(x => x.DatabaseName).ToList();
+
+                            this._databaseName = existingDatabase[0];
+                        }
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Cannot create database due to {0}", ex);
-                throw;
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Cannot read database due to {0}", ex);
+                    throw;
+                }
+
+                return this._databaseName;
             }
         }
     }
