@@ -35,12 +35,14 @@ namespace AnalyticsCollector
 
             using (var ingestClient = KustoIngestFactory.CreateQueuedIngestClient(kcsbDM))
             {
-                var ingestProps = new KustoQueuedIngestionProperties(DatabaseName, table);
-
-                ingestProps.ReportLevel = IngestionReportLevel.FailuresAndSuccesses;
-                ingestProps.ReportMethod = IngestionReportMethod.Queue;
-                ingestProps.JSONMappingReference = mappingName;
-                ingestProps.Format = DataSourceFormat.json;
+                var ingestProps =
+                    new KustoQueuedIngestionProperties(DatabaseName, table)
+                    {
+                        ReportLevel = IngestionReportLevel.FailuresAndSuccesses,
+                        ReportMethod = IngestionReportMethod.Queue,
+                        JSONMappingReference = mappingName,
+                        Format = DataSourceFormat.json
+                    };
 
                 ingestClient.IngestFromStream(memStream, ingestProps, leaveOpen: true);
 

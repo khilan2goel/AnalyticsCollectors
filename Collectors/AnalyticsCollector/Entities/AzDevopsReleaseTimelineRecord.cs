@@ -15,7 +15,7 @@ namespace AnalyticsCollector
         private readonly string mappingName = "ReleaseTimelineRecord_mapping_2";
         private readonly string organizationName;
         private readonly string projectId;
-        private int BatchSize = 10000;
+        private int BatchSize = 5000;
 
         public AzDevopsReleaseTimelineRecord(ReleaseRestAPIProvider releaseRestApiProvider, string kustoConnectionString, string aadTenantIdOrTenantName, string organizationName, string projectId)
             : base(kustoConnectionString, aadTenantIdOrTenantName)
