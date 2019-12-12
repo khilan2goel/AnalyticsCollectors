@@ -115,5 +115,31 @@ namespace AnalyticsCollector
                 }
             }
         }
+
+        public string GetDatabaseName()
+        {
+            try
+            {
+                // Set up Database	
+                var kcsbEngine =
+                    new KustoConnectionStringBuilder($"https://{this._kustoConnectionString}")
+                        .WithAadUserPromptAuthentication(authority: $"{_aadTenantIdOrTenantName}");
+
+                using (var kustoAdminClient = KustoClientFactory.CreateCslAdminProvider(kcsbEngine))
+                {
+                    // check if database already exists.	
+                    var showDatabasesCommands = CslCommandGenerator.GenerateDatabasesShowCommand();
+                    var existingDatabase =
+                        kustoAdminClient.ExecuteControlCommand<DatabasesShowCommandResult>(showDatabasesCommands).Select(x => x.DatabaseName).ToList();
+
+                    return existingDatabase[0];
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Cannot create database due to {0}", ex);
+                throw;
+            }
+        }
     }
 }

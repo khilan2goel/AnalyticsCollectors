@@ -11,7 +11,7 @@ namespace AnalyticsCollector
     public class AzDevopsReleaseTimelineRecord : AzureDataExplorerService
     {
         private ReleaseRestAPIProvider _releaseRestApiProvider;
-        private readonly string db = "axexperiments";
+        private readonly string db;
         private readonly string table = "ReleaseTimelineRecord";
         private readonly string mappingName = "ReleaseTimelineRecord_mapping_2";
         private readonly string organizationName;
@@ -24,6 +24,7 @@ namespace AnalyticsCollector
             this.organizationName = organizationName;
             this.projectId = projectId;
             this._releaseRestApiProvider = releaseRestApiProvider;
+            this.db = GetDatabaseName();
             this.CreateTableIfNotExists(db, table, mappingName);
         }
 

@@ -8,7 +8,7 @@ namespace AnalyticsCollector
 {
     public class AzDevopsWaterMark : AzureDataExplorerService
     {
-        private readonly string db = "axexperiments";
+        private readonly string db;
         private readonly string table = "WaterMarkTable";
         private readonly string mappingName = "WaterMark_mapping_2";
         private string organizationName;
@@ -17,6 +17,7 @@ namespace AnalyticsCollector
         public AzDevopsWaterMark(string kustoConnectionString, string aadTenantIdOrTenantName, string organization, string projectId)
             : base(kustoConnectionString, aadTenantIdOrTenantName)
         {
+            this.db = GetDatabaseName();
             this.CreateTableIfNotExists(db, table, mappingName);
             this.organizationName = organization;
             this.projectId = projectId;

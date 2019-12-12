@@ -9,7 +9,7 @@ namespace AnalyticsCollector
     public class AzDevopsAgentJobRequests : AzureDataExplorerService
     {
         private AgentJobRequestAPIProvider _agentsRequestRestApiProvider;
-        private readonly string db = "axexperiments";
+        private readonly string db;
         private readonly string table = "AgentJobRequests";
         private readonly string mappingName = "AgentJobRequests_mapping_2";
         private readonly string organizationName;
@@ -21,6 +21,7 @@ namespace AnalyticsCollector
             this.organizationName = organizationName;
             this.projectId = projectId;
             this._agentsRequestRestApiProvider = agentsRequestRestApiProvider;
+            this.db = GetDatabaseName();
             this.CreateTableIfNotExists(db, table, mappingName);
         }
 

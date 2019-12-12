@@ -11,7 +11,7 @@ namespace AnalyticsCollector
     public class AzDevopsRelease : AzureDataExplorerService
     {
         private ReleaseRestAPIProvider _releaseRestApiProvider;
-        private readonly string db = "axexperiments";
+        private readonly string db;
         private readonly string table = "Release";
         private readonly string mappingName = "Release_mapping_2";
         private readonly string organizationName;
@@ -23,6 +23,7 @@ namespace AnalyticsCollector
         {
             this.organizationName = organizationName;
             this.projectId = projectId;
+            this.db = GetDatabaseName();
             this._releaseRestApiProvider = releaseRestApiProvider;
             this.CreateTableIfNotExists(db, table, mappingName);
         }
