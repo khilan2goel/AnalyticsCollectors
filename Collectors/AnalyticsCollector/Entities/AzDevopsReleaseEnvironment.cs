@@ -51,11 +51,10 @@ namespace AnalyticsCollector
         private void WriteData(StreamWriter writer, string waterMark, out int continuationTokenOutput, out DateTime minCreatedDateTime)
         {
             TryParseWaterMark(waterMark, out int continuationToken, out minCreatedDateTime);
-            continuationToken = 12999030;
             int count = 0;
             do
             {
-                var releases = this._releaseRestApiProvider.GetReleases(DateTime.UtcNow.AddDays(-20), continuationToken, out continuationTokenOutput);
+                var releases = this._releaseRestApiProvider.GetReleases(minCreatedDateTime, continuationToken, out continuationTokenOutput);
                 Console.WriteLine($"ReleaseEnvironment: {continuationToken}");
                 int currentCount = releases.Count;
                 count += currentCount;
