@@ -16,3 +16,6 @@
 
 * Binaries for each assembly are produced in the
 `AnalyticsCollectors/Collectors/AnalyticsCollector/bin/Debug` directory. We can invoke exe generated in this folder using command line arguments as well.
+
+* NOTE: 
+Sometimes, Azure Data explorer connection is cached, please make sure to delete token from `%APPDATA%\Kusto\tokenCache.data` and try again.
