@@ -35,7 +35,7 @@ namespace AnalyticsCollector
             var azDevopReleaseDefinitionIngestor = new AzDevopsReleaseDefinition(azDevopsReleaseProvider, kustoConnectionString, aadTenantIdOrTenantName, organizationName, projectId);
             var azDevopsReleaseIngestor = new AzDevopsRelease(azDevopsReleaseProvider, kustoConnectionString, aadTenantIdOrTenantName, organizationName, projectId);
             var azDevopsReleaseEnvironmentIngestor = new AzDevopsReleaseEnvironment(azDevopsReleaseProvider, kustoConnectionString, aadTenantIdOrTenantName, organizationName, projectId);
-            var azDevopsReleaseTimelineRecordIngestor = new AzDevopsReleaseTimelineRecord(azDevopsReleaseProvider, kustoConnectionString, aadTenantIdOrTenantName, organizationName, projectId);
+            //var azDevopsReleaseTimelineRecordIngestor = new AzDevopsReleaseTimelineRecord(azDevopsReleaseProvider, kustoConnectionString, aadTenantIdOrTenantName, organizationName, projectId);
             //var axAzDevopsAgentJobRequestsIngestor = new AzDevopsAgentJobRequests(agentJobRequestAPIProvider, clusterNameAndRegion, authority, organizationName, projectId);
 
             Console.WriteLine("Igestion started for Release Entities");
@@ -45,8 +45,7 @@ namespace AnalyticsCollector
             () => azDevopsDeploymentIngestor.IngestData(axAzDevopsWaterMark),
             () => azDevopsReleaseIngestor.IngestData(axAzDevopsWaterMark),
             () => azDevopsArtifactIngestor.IngestData(axAzDevopsWaterMark),
-            () => azDevopsReleaseEnvironmentIngestor.IngestData(axAzDevopsWaterMark),
-            () => azDevopsReleaseTimelineRecordIngestor.IngestData(axAzDevopsWaterMark));
+            () => azDevopsReleaseEnvironmentIngestor.IngestData(axAzDevopsWaterMark));
 
             Console.WriteLine("Igestion completed");
             Console.ReadKey();
