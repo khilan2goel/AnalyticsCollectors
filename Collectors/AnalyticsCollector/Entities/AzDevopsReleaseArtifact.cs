@@ -67,7 +67,14 @@ namespace AnalyticsCollector
                 }
                 else if (continuationTokenOutput != 0)
                 {
-                    continuationToken = continuationTokenOutput;
+                    if (currentCount > 0 && releases[currentCount - 1].Id == continuationTokenOutput)
+                    {
+                        continuationToken = continuationTokenOutput + 1;
+                    }
+                    else
+                    {
+                        continuationToken = continuationTokenOutput;
+                    }
                 }
 
                 foreach (var release in releases)

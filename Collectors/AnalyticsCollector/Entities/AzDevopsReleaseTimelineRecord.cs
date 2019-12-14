@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Kusto.Data.Common;
 using Microsoft.VisualStudio.Services.ReleaseManagement.WebApi.Contracts;
 using Newtonsoft.Json;
@@ -67,10 +68,18 @@ namespace AnalyticsCollector
                 }
                 else if (continuationTokenOutput != 0)
                 {
-                    continuationToken = continuationTokenOutput;
+                    if (currentCount > 0 && releases[currentCount - 1].Id == continuationTokenOutput)
+                    {
+                        continuationToken = continuationTokenOutput + 1;
+                    }
+                    else
+                    {
+                        continuationToken = continuationTokenOutput;
+                    }
                 }
 
-                foreach (var release in releases)
+                List<string> releaseObjects = new List<string>();
+                Parallel.ForEach(releases, (release) =>
                 {
                     var releaseFullObject = this._releaseRestApiProvider.GetRelease(release.Id);
                     foreach (var releaseEnvironment in releaseFullObject.Environments)
@@ -86,7 +95,7 @@ namespace AnalyticsCollector
                                 jObject.Add("ReleaseEnvironmentId", releaseEnvironment.Id);
                                 jObject.Add("ReleaseTimelineId", phase.RunPlanId);
                                 jObject.Add("Type", "Phase");
-                                writer.WriteLine(JsonConvert.SerializeObject(jObject));
+                                releaseObjects.Add(JsonConvert.SerializeObject(jObject));
 
                                 foreach (var job in phase.DeploymentJobs)
                                 {
@@ -98,7 +107,7 @@ namespace AnalyticsCollector
                                     jObject2.Add("ParentId", phase.RunPlanId);
                                     jObject2.Add("ReleaseTimelineId", phase.RunPlanId);
                                     jObject2.Add("Type", "Job");
-                                    writer.WriteLine(JsonConvert.SerializeObject(jObject2));
+                                    releaseObjects.Add(JsonConvert.SerializeObject(jObject2));
 
                                     foreach (var task in job.Tasks)
                                     {
@@ -110,12 +119,17 @@ namespace AnalyticsCollector
                                         jObject3.Add("ParentId", job.Job.TimelineRecordId);
                                         jObject3.Add("ReleaseTimelineId", phase.RunPlanId);
                                         jObject3.Add("Type", "Task");
-                                        writer.WriteLine(JsonConvert.SerializeObject(jObject3));
+                                        releaseObjects.Add(JsonConvert.SerializeObject(jObject3));
                                     }
                                 }
                             }
                         }
                     }
+                });
+
+                foreach (var releaseObject in releaseObjects)
+                {
+                    writer.WriteLine(releaseObject);
                 }
 
             } while (currentCount != 0 && continuationToken != 0 && count <= BatchSize);

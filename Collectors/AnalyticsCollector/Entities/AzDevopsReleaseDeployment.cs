@@ -66,7 +66,14 @@ namespace AnalyticsCollector
                 }
                 else if (continuationTokenOutput != 0)
                 {
-                    continuationToken = continuationTokenOutput;
+                    if (currentCount > 0 && deployments[currentCount - 1].Id == continuationTokenOutput)
+                    {
+                        continuationToken = continuationTokenOutput + 1;
+                    }
+                    else
+                    {
+                        continuationToken = continuationTokenOutput;
+                    }
                 }
 
                 foreach (var deployment in deployments)

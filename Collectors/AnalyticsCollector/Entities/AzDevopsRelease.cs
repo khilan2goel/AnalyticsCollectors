@@ -61,12 +61,19 @@ namespace AnalyticsCollector
                 count += currentCount;
                 if (currentCount > 0 && continuationTokenOutput == 0)
                 {
-                    continuationToken = releases[currentCount - 1].Id + 1;
+                    continuationToken = (releases[currentCount - 1].Id) + 1;
                     minCreatedDateTime = releases[currentCount - 1].CreatedOn;
                 }
                 else if (continuationTokenOutput != 0)
                 {
-                    continuationToken = continuationTokenOutput;
+                    if (currentCount > 0 && releases[currentCount - 1].Id == continuationTokenOutput)
+                    {
+                        continuationToken = continuationTokenOutput + 1;
+                    }
+                    else
+                    {
+                        continuationToken = continuationTokenOutput;
+                    }
                 }
 
                 foreach (var release in releases)

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Kusto.Data.Common;
-using Microsoft.VisualStudio.Services.ReleaseManagement.WebApi.Contracts;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -67,10 +67,18 @@ namespace AnalyticsCollector
                 }
                 else if (continuationTokenOutput != 0)
                 {
-                    continuationToken = continuationTokenOutput;
+                    if (currentCount > 0 && releases[currentCount - 1].Id == continuationTokenOutput)
+                    {
+                        continuationToken = continuationTokenOutput + 1;
+                    }
+                    else
+                    {
+                        continuationToken = continuationTokenOutput;
+                    }
                 }
 
-                foreach (var release in releases)
+                List<string> releaseObjects = new List<string>();
+                Parallel.ForEach(releases, (release) =>
                 {
                     var releaseFullObject = this._releaseRestApiProvider.GetRelease(release.Id);
                     foreach (var releaseEnvironment in releaseFullObject.Environments)
@@ -80,8 +88,13 @@ namespace AnalyticsCollector
                         jObject.Add("ProjectId", projectId);
                         jObject.Add("Data", jObject);
 
-                        writer.WriteLine(JsonConvert.SerializeObject(jObject));
+                        releaseObjects.Add(JsonConvert.SerializeObject(jObject));
                     }
+                });
+
+                foreach (var releaseObject in releaseObjects)
+                {
+                    writer.WriteLine(releaseObject);
                 }
 
             } while (currentCount !=0 && continuationToken != 0 && count <= BatchSize);
