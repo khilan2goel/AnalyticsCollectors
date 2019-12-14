@@ -54,36 +54,33 @@ namespace AnalyticsCollector
         }
 
         // Release Definition doesn't change much. If already igested once, dont ingest again.
-        private void WriteData(StreamWriter writer, string waterMark, out int continuationTokenOutput)
+        private void WriteData(StreamWriter writer, string waterMark, out int continuationToken)
         {
-            TryParseWaterMark(waterMark, out int continuationToken);
-
-            if (continuationToken == 0)
-            {
-                Console.WriteLine("ReleaseDefinition table already ingested once. Not ingesting again as this table doesnt change much.");
-                continuationTokenOutput = 0;
-                return;
-            }
-            else if (continuationToken == -1)
-            {
-                continuationToken = 0;
-            }
+            Int32.TryParse(waterMark, out continuationToken);
 
             int count = 0;
+            int currentCount;
             do
             {
-                var releaseDefinitions = this._releaseRestApiProvider.GetReleaseDefinitions(continuationToken, out continuationTokenOutput);
+                var releaseDefinitions = this._releaseRestApiProvider.GetReleaseDefinitions(continuationToken, out int continuationTokenOutput);
                 Console.WriteLine($"ReleaseDefinition: {continuationToken}");
-                int currentCount = releaseDefinitions.Count;
+                currentCount = releaseDefinitions.Count;
                 count += currentCount;
 
-                if (currentCount > 0 && (continuationToken !=0 && continuationTokenOutput == 0))
+                if (currentCount > 0 && continuationTokenOutput == 0)
                 {
                     continuationToken = releaseDefinitions[currentCount - 1].Id + 1;
                 }
                 else
                 {
-                    continuationToken = continuationTokenOutput;
+                    if (currentCount > 0 && releaseDefinitions[currentCount - 1].Id == continuationTokenOutput)
+                    {
+                        continuationToken = continuationTokenOutput + 1;
+                    }
+                    else
+                    {
+                        continuationToken = continuationTokenOutput;
+                    }
                 }
 
                 foreach (var release in releaseDefinitions)
@@ -95,7 +92,7 @@ namespace AnalyticsCollector
                     writer.WriteLine(JsonConvert.SerializeObject(jObject));
                 }
 
-            } while (continuationToken != 0 && count <= BatchSize);
+            } while (currentCount != 0 && continuationToken != 0 && count <= BatchSize);
         }
 
         protected override List<Tuple<string, string>> GetColumns()
@@ -174,27 +171,5 @@ namespace AnalyticsCollector
             { ColumnName = "Variables", JsonPath = "$.Variables" });
             return columnMappings;
         }
-
-        private static bool TryParseWaterMark(string waterMark, out int continuationToken)
-        {
-            continuationToken = -1;
-
-            if (!string.IsNullOrWhiteSpace(waterMark))
-            {
-                string[] waterMarks = waterMark.Split(',');
-
-                if (!int.TryParse(waterMarks[0], out continuationToken))
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                return true;
-            }
-
-            return true;
-        }
-
     }
 }
