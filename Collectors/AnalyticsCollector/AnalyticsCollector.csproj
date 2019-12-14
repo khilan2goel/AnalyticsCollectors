@@ -232,6 +232,7 @@
     <Compile Include="Entities\AzDevopsReleaseEnvironment.cs" />
     <Compile Include="Entities\AzDevopsReleaseTimelineRecord.cs" />
     <Compile Include="Entities\AzDevopsWaterMark.cs" />
+    <Compile Include="ParsingHelper.cs" />
     <Compile Include="RestAPIProvider\AgentJobRequestAPIProvider.cs" />
     <Compile Include="RestAPIProvider\HttpRestAPIProvider.cs" />
     <Compile Include="RestAPIProvider\ProjectRestAPIProvider.cs" />
