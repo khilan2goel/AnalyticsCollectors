@@ -71,7 +71,7 @@ namespace AnalyticsCollector
                 {
                     continuationToken = releaseDefinitions[currentCount - 1].Id + 1;
                 }
-                else
+                else if (continuationTokenOutput != 0)
                 {
                     if (currentCount > 0 && releaseDefinitions[currentCount - 1].Id == continuationTokenOutput)
                     {
