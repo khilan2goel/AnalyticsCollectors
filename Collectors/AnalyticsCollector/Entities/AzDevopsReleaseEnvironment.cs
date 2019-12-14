@@ -28,24 +28,31 @@ namespace AnalyticsCollector
 
         public void IngestData(AzDevopsWaterMark azureAzDevopsWaterMark)
         {
-            var waterMark = azureAzDevopsWaterMark.ReadWaterMark(this.table);
-            int continuationToken;
-            DateTime minCreatedDateTime;
-
-            using (var memStream = new MemoryStream())
-            using (var writer = new StreamWriter(memStream))
+            try
             {
-                // Write data to table
-                WriteData(writer, waterMark, out continuationToken, out minCreatedDateTime);
+                var waterMark = azureAzDevopsWaterMark.ReadWaterMark(this.table);
+                int continuationToken;
+                DateTime minCreatedDateTime;
 
-                writer.Flush();
-                memStream.Seek(0, SeekOrigin.Begin);
+                using (var memStream = new MemoryStream())
+                using (var writer = new StreamWriter(memStream))
+                {
+                    // Write data to table
+                    WriteData(writer, waterMark, out continuationToken, out minCreatedDateTime);
 
-                this.IngestData(table, mappingName, memStream);
+                    writer.Flush();
+                    memStream.Seek(0, SeekOrigin.Begin);
+
+                    this.IngestData(table, mappingName, memStream);
+                }
+
+                waterMark = string.Format("{0},{1}", continuationToken, minCreatedDateTime);
+                azureAzDevopsWaterMark.UpdateWaterMark(table, waterMark);
             }
-
-            waterMark = string.Format("{0},{1}", continuationToken, minCreatedDateTime);
-            azureAzDevopsWaterMark.UpdateWaterMark(table, waterMark);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Not able to ingest Releaseenvironment entity due to {ex}");
+            }
         }
 
         private void WriteData(StreamWriter writer, string waterMark, out int continuationToken, out DateTime minCreatedDateTime)

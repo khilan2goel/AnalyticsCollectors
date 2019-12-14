@@ -27,23 +27,30 @@ namespace AnalyticsCollector
 
         public void IngestData(AzDevopsWaterMark azureAzDevopsWaterMark)
         {
-            var waterMark = azureAzDevopsWaterMark.ReadWaterMark(this._table);
-            int continuationToken;
-
-            using (var memStream = new MemoryStream())
-            using (var writer = new StreamWriter(memStream))
+            try
             {
-                // Write data to table
-                WriteData(writer, waterMark, out continuationToken);
+                var waterMark = azureAzDevopsWaterMark.ReadWaterMark(this._table);
+                int continuationToken;
 
-                writer.Flush();
-                memStream.Seek(0, SeekOrigin.Begin);
+                using (var memStream = new MemoryStream())
+                using (var writer = new StreamWriter(memStream))
+                {
+                    // Write data to table
+                    WriteData(writer, waterMark, out continuationToken);
 
-                this.IngestData(_table, _mappingName, memStream);
+                    writer.Flush();
+                    memStream.Seek(0, SeekOrigin.Begin);
+
+                    this.IngestData(_table, _mappingName, memStream);
+                }
+
+                waterMark = $"{continuationToken}";
+                azureAzDevopsWaterMark.UpdateWaterMark(_table, waterMark);
             }
-
-            waterMark = $"{continuationToken}";
-            azureAzDevopsWaterMark.UpdateWaterMark(_table, waterMark);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Not able to ingest ReleaseDefinition entity due to {ex}");
+            }
         }
 
         // Release Definition doesn't change much. If already igested once, dont ingest again.
