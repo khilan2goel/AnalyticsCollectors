@@ -70,7 +70,7 @@ namespace AnalyticsCollector
                 int currentCount = releaseDefinitions.Count;
                 count += currentCount;
 
-                if (currentCount > 0 && (continuationToken != 0 && continuationTokenOutput == 0))
+                if (currentCount > 0 && (continuationToken !=0 && continuationTokenOutput == 0))
                 {
                     continuationToken = releaseDefinitions[currentCount - 1].Id + 1;
                 }

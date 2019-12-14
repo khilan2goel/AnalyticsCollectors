@@ -47,23 +47,24 @@ namespace AnalyticsCollector
             azureAzDevopsWaterMark.UpdateWaterMark(table, waterMark);
         }
 
-        private void WriteData(StreamWriter writer, string waterMark, out int continuationTokenOutput, out DateTime minModifiedDate)
+        private void WriteData(StreamWriter writer, string waterMark, out int continuationToken, out DateTime minModifiedDate)
         {
-            TryParseWaterMark(waterMark, out int continuationToken, out minModifiedDate);
+            ParsingHelper.TryParseWaterMark(waterMark, out continuationToken, out minModifiedDate);
             int count = 0;
+            int currentCount;
             do
             {
-                var deployments = this._releaseRestApiProvider.GetDeployments(minModifiedDate, continuationToken, out continuationTokenOutput);
+                var deployments = this._releaseRestApiProvider.GetDeployments(minModifiedDate, continuationToken, out int continuationTokenOutput);
                 Console.WriteLine($"ReleaseDeployment: {continuationToken}");
-                int currentCount = deployments.Count;
+                currentCount = deployments.Count;
                 count += currentCount;
 
-                if (currentCount > 0 && (continuationToken != 0 && continuationTokenOutput == 0))
+                if (currentCount > 0 && continuationTokenOutput == 0)
                 {
                     continuationToken = deployments[currentCount - 1].Id + 1;
                     minModifiedDate = deployments[currentCount - 1].LastModifiedOn;
                 }
-                else
+                else if (continuationTokenOutput != 0)
                 {
                     continuationToken = continuationTokenOutput;
                 }
@@ -77,7 +78,7 @@ namespace AnalyticsCollector
                     writer.WriteLine(JsonConvert.SerializeObject(jObject));
                 }
 
-            } while (continuationToken != 0 && count <= batchSize);
+            } while (currentCount !=0 && continuationToken != 0 && count <= batchSize);
         }
 
         protected override List<Tuple<string, string>> GetColumns()
@@ -173,33 +174,6 @@ namespace AnalyticsCollector
             columnMappings.Add(new JsonColumnMapping()
             { ColumnName = "LastModifiedByUniqueName", JsonPath = "$.LastModifiedBy.uniqueName" });
             return columnMappings;
-        }
-
-        private static bool TryParseWaterMark(string waterMark, out int continuationToken, out DateTime minModifiedDate)
-        {
-            continuationToken = 0;
-            minModifiedDate = default(DateTime);
-
-            if (!string.IsNullOrWhiteSpace(waterMark))
-            {
-                string[] waterMarks = waterMark.Split(',');
-
-                if (!int.TryParse(waterMarks[0], out continuationToken))
-                {
-                    return false;
-                }
-
-                if (!DateTime.TryParse(waterMarks[1], out minModifiedDate))
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                return true;
-            }
-
-            return true;
         }
     }
 }

@@ -48,23 +48,24 @@ namespace AnalyticsCollector
             azureAzDevopsWaterMark.UpdateWaterMark(table, waterMark);
         }
 
-        private void WriteData(StreamWriter writer, string waterMark, out int continuationTokenOutput, out DateTime minCreatedDateTime)
+        private void WriteData(StreamWriter writer, string waterMark, out int continuationToken, out DateTime minCreatedDateTime)
         {
-            TryParseWaterMark(waterMark, out int continuationToken, out minCreatedDateTime);
+            ParsingHelper.TryParseWaterMark(waterMark, out continuationToken, out minCreatedDateTime);
             int count = 0;
+            int currentCount;
             do
             {
-                var releases = this._releaseRestApiProvider.GetReleases(minCreatedDateTime, continuationToken, out continuationTokenOutput, ReleaseExpands.Artifacts);
+                var releases = this._releaseRestApiProvider.GetReleases(minCreatedDateTime, continuationToken, out int continuationTokenOutput, ReleaseExpands.Artifacts);
                 Console.WriteLine($"ReleaseArtifact: {continuationToken}");
-                int currentCount = releases.Count;
+                currentCount = releases.Count;
                 count += currentCount;
 
-                if (currentCount > 0 && (continuationToken != 0 && continuationTokenOutput == 0))
+                if (currentCount > 0 && continuationTokenOutput == 0)
                 {
                     continuationToken = releases[currentCount - 1].Id + 1;
                     minCreatedDateTime = releases[currentCount - 1].CreatedOn;
                 }
-                else
+                else if (continuationTokenOutput != 0)
                 {
                     continuationToken = continuationTokenOutput;
                 }
@@ -82,7 +83,7 @@ namespace AnalyticsCollector
                     }
                 }
 
-            } while (continuationToken != 0 && count <= BatchSize);
+            } while (currentCount !=0 && continuationToken != 0 && count <= BatchSize);
         }
 
         protected override List<Tuple<string, string>> GetColumns()
@@ -199,33 +200,6 @@ namespace AnalyticsCollector
             columnMappings.Add(new JsonColumnMapping()
             { ColumnName = "IsPrimary", JsonPath = "$.IsPrimary" });
             return columnMappings;
-        }
-
-        private static bool TryParseWaterMark(string waterMark, out int continuationToken, out DateTime minModifiedDate)
-        {
-            continuationToken = 0;
-            minModifiedDate = default(DateTime);
-
-            if (!string.IsNullOrWhiteSpace(waterMark))
-            {
-                string[] waterMarks = waterMark.Split(',');
-
-                if (!int.TryParse(waterMarks[0], out continuationToken))
-                {
-                    return false;
-                }
-
-                if (!DateTime.TryParse(waterMarks[1], out minModifiedDate))
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                return true;
-            }
-
-            return true;
         }
     }
 }
