@@ -51,7 +51,7 @@ namespace AnalyticsCollector
             }
             catch (Exception ex)
             {
-
+                Console.WriteLine($"Not able to ingest ReleaseArtifact entity due to {ex}");
             }
         }
 
