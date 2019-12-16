@@ -16,7 +16,7 @@ namespace AnalyticsCollector
         private readonly string mappingName = "ReleaseTimelineRecord_mapping_2";
         private readonly string organizationName;
         private readonly string projectId;
-        private int BatchSize = 5000;
+        private int BatchSize = 500;
 
         public AzDevopsReleaseTimelineRecord(ReleaseRestAPIProvider releaseRestApiProvider, string kustoConnectionString, string aadTenantIdOrTenantName, string organizationName, string projectId)
             : base(kustoConnectionString, aadTenantIdOrTenantName)
@@ -34,21 +34,27 @@ namespace AnalyticsCollector
                 var waterMark = azureAzDevopsWaterMark.ReadWaterMark(this.table);
                 int continuationToken;
                 DateTime minCreatedDateTime;
-
-                using (var memStream = new MemoryStream())
-                using (var writer = new StreamWriter(memStream))
+                int count = 0;
+                int totalCount;
+                do
                 {
-                    // Write data to table
-                    WriteData(writer, waterMark, out continuationToken, out minCreatedDateTime);
+                    using (var memStream = new MemoryStream())
+                    using (var writer = new StreamWriter(memStream))
+                    {
+                        // Write data to table
+                        WriteData(writer, waterMark, out continuationToken, out minCreatedDateTime, out totalCount);
 
-                    writer.Flush();
-                    memStream.Seek(0, SeekOrigin.Begin);
+                        writer.Flush();
+                        memStream.Seek(0, SeekOrigin.Begin);
 
-                    this.IngestData(table, mappingName, memStream);
-                }
+                        this.IngestData(table, mappingName, memStream);
+                    }
 
-                waterMark = string.Format("{0},{1}", continuationToken, minCreatedDateTime);
-                azureAzDevopsWaterMark.UpdateWaterMark(table, waterMark);
+                    waterMark = string.Format("{0},{1}", continuationToken, minCreatedDateTime);
+                    azureAzDevopsWaterMark.UpdateWaterMark(table, waterMark);
+
+                    count++;
+                } while (count != 10 && totalCount > 0);
             }
             catch (Exception ex)
             {
@@ -56,7 +62,7 @@ namespace AnalyticsCollector
             }
         }
 
-        private void WriteData(StreamWriter writer, string waterMark, out int continuationToken, out DateTime minCreatedDateTime)
+        private void WriteData(StreamWriter writer, string waterMark, out int continuationToken, out DateTime minCreatedDateTime, out int totalCount)
         {
             ParsingHelper.TryParseWaterMark(waterMark, out continuationToken, out minCreatedDateTime);
             int count = 0;
@@ -134,6 +140,7 @@ namespace AnalyticsCollector
                     }
                 });
 
+                totalCount = releaseObjects.Count;
                 foreach (var releaseObject in releaseObjects)
                 {
                     writer.WriteLine(releaseObject);

@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.VisualStudio.Services.Common;
-using Microsoft.VisualStudio.Services.ReleaseManagement.WebApi.Clients;
 
 namespace AnalyticsCollector
 {
@@ -40,7 +39,9 @@ namespace AnalyticsCollector
             () => azDevopsDeploymentIngestor.IngestData(axAzDevopsWaterMark),
             () => azDevopsReleaseIngestor.IngestData(axAzDevopsWaterMark),
             () => azDevopsArtifactIngestor.IngestData(axAzDevopsWaterMark),
-            () => azDevopsReleaseEnvironmentIngestor.IngestData(axAzDevopsWaterMark));
+            () => azDevopsReleaseEnvironmentIngestor.IngestData(axAzDevopsWaterMark)
+            //() => azDevopsReleaseTimelineRecordIngestor.IngestData(axAzDevopsWaterMark)
+            );
 
             Console.WriteLine("Igestion completed");
             Console.ReadKey();

@@ -34,7 +34,7 @@ namespace AnalyticsCollector
                 int continuationToken;
                 DateTime minCreatedDateTime;
                 int count = 0;
-                int totalCount = 0;
+                int totalCount;
                 do
                 {
                     using (var memStream = new MemoryStream())
