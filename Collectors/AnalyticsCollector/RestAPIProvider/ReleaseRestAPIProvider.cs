@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.ReleaseManagement.WebApi;
 using Microsoft.VisualStudio.Services.ReleaseManagement.WebApi.Clients;
 using Microsoft.VisualStudio.Services.ReleaseManagement.WebApi.Contracts;
@@ -17,17 +18,25 @@ namespace AnalyticsCollector
     {
         private ReleaseHttpClient releaseHttpClient;
         private string projectName;
+        private string organizationName;
 
-        public ReleaseRestAPIProvider(string alias, string token, ReleaseHttpClient releaseHttpClient,
-            string projectName) : base(GetClientUsingBasicAuth(alias, token))
+        public ReleaseRestAPIProvider(string alias, string token, string organizationName,
+            string projectName) : this(alias, token, organizationName, projectName, GetReleaseHttpClient(alias, token, organizationName))
+        {
+            
+        }
+
+        protected ReleaseRestAPIProvider(string alias, string token, string organizationName,
+            string projectName, ReleaseHttpClient releaseHttpClient) : base(GetClientUsingBasicAuth(alias, token))
         {
             this.releaseHttpClient = releaseHttpClient;
             this.projectName = projectName;
+            this.organizationName = organizationName;
         }
 
         public List<Deployment> GetDeployments(DateTime minModifiedDateTime, int? continuationToken, out int nextContinuationToken)
         {
-            var url = $"https://vsrm.dev.azure.com/mseng/{this.projectName}/_apis/release/deployments?queryOrder=ascending&minModifiedTime={minModifiedDateTime}&continuationToken={continuationToken}";
+            var url = $"https://vsrm.dev.azure.com/{this.organizationName}/{this.projectName}/_apis/release/deployments?queryOrder=ascending&minModifiedTime={minModifiedDateTime}&continuationToken={continuationToken}";
             Task<HttpResponseMessage> response = this.httpClient.GetAsync(new Uri(url));
             nextContinuationToken = 0;
             var statusCode = response.Result.StatusCode;
@@ -61,16 +70,14 @@ namespace AnalyticsCollector
 
                 return releases;
             }
-            else
-            {
-                Console.WriteLine($"Got HttpStatusCode: {statusCode}");
-                return null;
-            }
+
+            Console.WriteLine($"Got HttpStatusCode: {statusCode}");
+            return null;
         }
 
         public List<Release> GetReleases(DateTime minCreatedDateTime, int continuationToken, out int nextContinuationToken, ReleaseExpands releaseexpands = ReleaseExpands.None)
         {
-            var url = $"https://vsrm.dev.azure.com/mseng/{this.projectName}/_apis/release/releases?queryOrder=ascending&minCreatedTime={minCreatedDateTime}&continuationToken={continuationToken}&$expand={releaseexpands}";
+            var url = $"https://vsrm.dev.azure.com/{this.organizationName}/{this.projectName}/_apis/release/releases?queryOrder=ascending&minCreatedTime={minCreatedDateTime}&continuationToken={continuationToken}&$expand={releaseexpands}";
             Task<HttpResponseMessage> response = this.httpClient.GetAsync(new Uri(url));
             nextContinuationToken = 0;
             var statusCode = response.Result.StatusCode;
@@ -104,11 +111,9 @@ namespace AnalyticsCollector
 
                 return releases;
             }
-            else
-            {
-                Console.WriteLine($"Got HttpStatusCode: {statusCode}");
-                return null;
-            }
+
+            Console.WriteLine($"Got HttpStatusCode: {statusCode}");
+            return null;
         }
 
         public Release GetRelease(int releaseId)
@@ -116,15 +121,9 @@ namespace AnalyticsCollector
             return this.releaseHttpClient.GetReleaseAsync(this.projectName, releaseId: releaseId).SyncResult();
         }
 
-        public ReleaseDefinition GetReleaseDefinition(int definitionId)
-        {
-            return this.releaseHttpClient.GetReleaseDefinitionAsync(this.projectName, definitionId: definitionId)
-                .SyncResult();
-        }
-
         public List<ReleaseDefinition> GetReleaseDefinitions(int? continuationToken, out int nextContinuationToken)
         {
-            var url = $"https://vsrm.dev.azure.com/mseng/{this.projectName}/_apis/release/definitions?queryOrder=idAscending&continuationToken={continuationToken}";
+            var url = $"https://vsrm.dev.azure.com/{this.organizationName}/{this.projectName}/_apis/release/definitions?queryOrder=idAscending&continuationToken={continuationToken}";
             Task<HttpResponseMessage> response = this.httpClient.GetAsync(new Uri(url));
             nextContinuationToken = 0;
             var statusCode = response.Result.StatusCode;
@@ -158,11 +157,9 @@ namespace AnalyticsCollector
 
                 return releaseDefinitions;
             }
-            else
-            {
-                Console.WriteLine($"Got HttpStatusCode: {statusCode}");
-                return null;
-            }
+
+            Console.WriteLine($"Got HttpStatusCode: {statusCode}");
+            return null;
         }
 
         private static HttpClient GetClientUsingBasicAuth(string alias, string token)
@@ -173,6 +170,12 @@ namespace AnalyticsCollector
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
 
             return client;
+        }
+
+        private static ReleaseHttpClient GetReleaseHttpClient(string alias, string token, string organizationName)
+        {
+            return new ReleaseHttpClient(new Uri($"https://vsrm.dev.azure.com/{organizationName}"),
+                new VssCredentials(new VssBasicCredential(alias, token)));
         }
     }
 }
