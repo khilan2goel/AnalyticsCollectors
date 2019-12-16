@@ -17,14 +17,10 @@ namespace AnalyticsCollector
             string organizationName = args[4]; //"mseng";
             string projectName = args[5]; //"AzureDevops";
 
-            ReleaseHttpClient releaseHttpClient = new ReleaseHttpClient(new Uri($"https://vsrm.dev.azure.com/{organizationName}"),
-                new VssCredentials(new VssBasicCredential(alias, token)));
-
             ProjectHttpClient projectHttpClient = new ProjectHttpClient(new Uri($"https://dev.azure.com/{organizationName}"),
                 new VssCredentials(new VssBasicCredential(alias, token)));
 
-            var azDevopsReleaseProvider = new ReleaseRestAPIProvider(alias, token, releaseHttpClient, projectName);
-            // var agentJobRequestAPIProvider = new AgentJobRequestAPIProvider(alias, token);
+            var azDevopsReleaseProvider = new ReleaseRestAPIProvider(alias, token, organizationName, projectName);
             var azDevopsProjectsProvider = new ProjectRestAPIProvider(projectHttpClient, projectName);
 
             var projectId = azDevopsProjectsProvider.GetProjectInfo(projectName).Id.ToString();
@@ -36,7 +32,6 @@ namespace AnalyticsCollector
             var azDevopsReleaseIngestor = new AzDevopsRelease(azDevopsReleaseProvider, kustoConnectionString, aadTenantIdOrTenantName, organizationName, projectId);
             var azDevopsReleaseEnvironmentIngestor = new AzDevopsReleaseEnvironment(azDevopsReleaseProvider, kustoConnectionString, aadTenantIdOrTenantName, organizationName, projectId);
             //var azDevopsReleaseTimelineRecordIngestor = new AzDevopsReleaseTimelineRecord(azDevopsReleaseProvider, kustoConnectionString, aadTenantIdOrTenantName, organizationName, projectId);
-            //var axAzDevopsAgentJobRequestsIngestor = new AzDevopsAgentJobRequests(agentJobRequestAPIProvider, clusterNameAndRegion, authority, organizationName, projectId);
 
             Console.WriteLine("Igestion started for Release Entities");
 

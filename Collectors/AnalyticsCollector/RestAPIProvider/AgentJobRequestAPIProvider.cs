@@ -11,13 +11,16 @@ namespace AnalyticsCollector
 {
     public class AgentJobRequestAPIProvider : HttpRestAPIProvider
     {
-        public AgentJobRequestAPIProvider(string alias, string token) : base(GetClientUsingBasicAuth(alias, token))
+        private string organizationName;
+
+        public AgentJobRequestAPIProvider(string alias, string token, string organizationName) : base(GetClientUsingBasicAuth(alias, token))
         {
+            this.organizationName = organizationName;
         }
 
         public List<JObject> GetAgentJobRequests(int poolId)
         {
-            var url = $"https://dev.azure.com/mseng/_apis/distributedtask/pools/{poolId}/jobrequests";
+            var url = $"https://dev.azure.com/{this.organizationName}/_apis/distributedtask/pools/{poolId}/jobrequests";
             Task<HttpResponseMessage> response = this.httpClient.GetAsync(new Uri(url));
             var statusCode = response.Result.StatusCode;
 
