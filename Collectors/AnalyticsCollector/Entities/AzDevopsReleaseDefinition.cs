@@ -17,8 +17,8 @@ namespace AnalyticsCollector
         private readonly string _projectId;
         private int BatchSize = 10000;
 
-        public AzDevopsReleaseDefinition(ReleaseRestAPIProvider releaseRestApiProvider, IKustoClientFactory kustoClientFactory, string kustoConnectionString, string aadTenantIdOrTenantName, string organizationName, string projectId)
-            : base(kustoClientFactory, kustoConnectionString, aadTenantIdOrTenantName)
+        public AzDevopsReleaseDefinition(ReleaseRestAPIProvider releaseRestApiProvider, IKustoClientFactory kustoClientFactory, string organizationName, string projectId)
+            : base(kustoClientFactory)
         {
             this._releaseRestApiProvider = releaseRestApiProvider;
             this._organizationName = organizationName;

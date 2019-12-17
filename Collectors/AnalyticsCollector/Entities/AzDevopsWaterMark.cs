@@ -14,8 +14,8 @@ namespace AnalyticsCollector
         private string organizationName;
         private string projectId;
 
-        public AzDevopsWaterMark(IKustoClientFactory kustoClientFactory, string kustoConnectionString, string aadTenantIdOrTenantName, string organization, string projectId)
-            : base(kustoClientFactory, kustoConnectionString, aadTenantIdOrTenantName)
+        public AzDevopsWaterMark(IKustoClientFactory kustoClientFactory, string organization, string projectId)
+            : base(kustoClientFactory)
         {
             this.CreateTableIfNotExists(table, mappingName);
             this.organizationName = organization;

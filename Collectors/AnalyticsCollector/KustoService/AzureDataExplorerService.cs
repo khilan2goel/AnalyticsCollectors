@@ -14,16 +14,14 @@ namespace AnalyticsCollector
 {
     public abstract class AzureDataExplorerService
     {
-        private string _kustoConnectionString;
-        private string _aadTenantIdOrTenantName;
+        private readonly IKustoQueuedIngestClient _ingestionClient;
+        private readonly KustoConnectionStringBuilder _kustoConnectionStringBuilder;
         private string _databaseName;
-        private IKustoQueuedIngestClient ingestionClient;
 
-        protected AzureDataExplorerService(IKustoClientFactory kustoClientFactory, string kustoConnectionString, string aadTenantIdOrTenantName)
+        protected AzureDataExplorerService(IKustoClientFactory kustoClientFactory)
         {
-            this._kustoConnectionString = kustoConnectionString;
-            this._aadTenantIdOrTenantName = aadTenantIdOrTenantName;
-            this.ingestionClient = kustoClientFactory.GetQueuedIngestClient();
+            this._ingestionClient = kustoClientFactory.GetQueuedIngestClient();
+            this._kustoConnectionStringBuilder = kustoClientFactory.KustoConnectionStringBuilder;
         }
 
         protected abstract List<Tuple<string, string>> GetColumns();
@@ -41,27 +39,22 @@ namespace AnalyticsCollector
                     Format = DataSourceFormat.json
                 };
 
-            ingestionClient.IngestFromStream(memStream, ingestProps, leaveOpen: true);
+            _ingestionClient.IngestFromStream(memStream, ingestProps, leaveOpen: true);
 
             // Wait and retrieve all notifications
             Thread.Sleep(10000);
-            var errors = ingestionClient.GetAndDiscardTopIngestionFailuresAsync().GetAwaiter().GetResult();
-            var successes = ingestionClient.GetAndDiscardTopIngestionSuccessesAsync().GetAwaiter().GetResult();
+            var errors = _ingestionClient.GetAndDiscardTopIngestionFailuresAsync().GetAwaiter().GetResult();
+            var successes = _ingestionClient.GetAndDiscardTopIngestionSuccessesAsync().GetAwaiter().GetResult();
 
-            errors.ForEach((f) => { Console.WriteLine($"Ingestion error: {f.Info.Details}"); });
-            successes.ForEach((s) => { Console.WriteLine($"Ingested: {s.Info.IngestionSourcePath}"); });
+            errors.ForEach((f) => { Console.WriteLine($"Ingestion error: {f.Info.Details}."); });
+            successes.ForEach((s) => { Console.WriteLine($"Ingested : {s.Info.IngestionSourcePath}"); });
         }
 
         public void CreateTableIfNotExists(string table, string mappingName)
         {
             try
             {
-                // Set up table
-                var kcsbEngine =
-                    new KustoConnectionStringBuilder($"https://{this._kustoConnectionString}")
-                        .WithAadUserPromptAuthentication(authority: $"{_aadTenantIdOrTenantName}");
-
-                using (var kustoAdminClient = KustoClientFactory.CreateCslAdminProvider(kcsbEngine))
+                using (var kustoAdminClient = KustoClientFactory.CreateCslAdminProvider(_kustoConnectionStringBuilder))
                 {
                     // check if already exists.
                     var showTableCommands = CslCommandGenerator.GenerateTablesShowDetailsCommand();
@@ -91,15 +84,11 @@ namespace AnalyticsCollector
 
         public IEnumerable<IDictionary<string, object>> ExecuteQuery(string query, Dictionary<string, string> queryParameters)
         {
-            var kcsbEngine =
-                new KustoConnectionStringBuilder($"https://{this._kustoConnectionString}")
-                    .WithAadUserPromptAuthentication(authority: $"{_aadTenantIdOrTenantName}");
-
             var clientRequestProperties = new ClientRequestProperties(
                 options: null,
                 parameters: queryParameters);
 
-            using (var client = KustoClientFactory.CreateCslQueryProvider(kcsbEngine))
+            using (var client = KustoClientFactory.CreateCslQueryProvider(_kustoConnectionStringBuilder))
             {
                 var reader = client.ExecuteQuery(DatabaseName, query, clientRequestProperties);
 
@@ -123,11 +112,7 @@ namespace AnalyticsCollector
                 {
                     if (string.IsNullOrEmpty(this._databaseName))
                     {
-                        var kcsbEngine =
-                            new KustoConnectionStringBuilder($"https://{this._kustoConnectionString}")
-                                .WithAadUserPromptAuthentication(authority: $"{_aadTenantIdOrTenantName}");
-
-                        using (var kustoAdminClient = KustoClientFactory.CreateCslAdminProvider(kcsbEngine))
+                        using (var kustoAdminClient = KustoClientFactory.CreateCslAdminProvider(_kustoConnectionStringBuilder))
                         {
                             // get database name
                             var showDatabasesCommands = CslCommandGenerator.GenerateDatabasesShowCommand();
@@ -142,7 +127,7 @@ namespace AnalyticsCollector
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Cannot read database due to {0}", ex);
+                    Console.WriteLine("Cannot read database due to {0}. Possible reason could be database not created or clean {1} and try again", ex, "%APPDATA%\\Kusto\\tokenCache.data");
                     throw;
                 }
 

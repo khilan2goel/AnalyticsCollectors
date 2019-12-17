@@ -15,8 +15,8 @@ namespace AnalyticsCollector
         private readonly string organizationName;
         private readonly string projectId;
 
-        public AzDevopsAgentJobRequests(AgentJobRequestAPIProvider agentsRequestRestApiProvider, IKustoClientFactory kustoClientFactory, string kustoConnectionString, string aadTenantIdOrTenantName, string organizationName, string projectId)
-            : base(kustoClientFactory, kustoConnectionString, aadTenantIdOrTenantName)
+        public AzDevopsAgentJobRequests(AgentJobRequestAPIProvider agentsRequestRestApiProvider, IKustoClientFactory kustoClientFactory, string organizationName, string projectId)
+            : base(kustoClientFactory)
         {
             this.organizationName = organizationName;
             this.projectId = projectId;
