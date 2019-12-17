@@ -23,6 +23,9 @@ namespace AnalyticsCollector.KustoService
             return ingestionClient ?? (ingestionClient = KustoIngestFactory.CreateQueuedIngestClient(kcsbDM));
         }
 
+        public KustoConnectionStringBuilder KustoConnectionStringBuilder => new KustoConnectionStringBuilder($"https://{this.connectionString}")
+                    .WithAadUserPromptAuthentication(authority: $"{aadTenantIdOrTenantName}");
+
         public void Dispose()
         {
             Dispose(true);
