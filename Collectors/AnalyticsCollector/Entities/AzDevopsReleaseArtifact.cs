@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using AnalyticsCollector.KustoService;
 using Kusto.Data.Common;
 using Microsoft.VisualStudio.Services.ReleaseManagement.WebApi.Contracts;
 using Newtonsoft.Json;
@@ -17,8 +18,8 @@ namespace AnalyticsCollector
         private readonly string projectId;
         private int BatchSize = 10000;
 
-        public AzDevopsReleaseArtifact(ReleaseRestAPIProvider releaseRestApiProvider, string kustoConnectionString, string aadTenantIdOrTenantName, string organizationName, string projectId)
-            : base(kustoConnectionString, aadTenantIdOrTenantName)
+        public AzDevopsReleaseArtifact(ReleaseRestAPIProvider releaseRestApiProvider, IKustoClientFactory kustoClientFactory, string kustoConnectionString, string aadTenantIdOrTenantName, string organizationName, string projectId)
+            : base(kustoClientFactory, kustoConnectionString, aadTenantIdOrTenantName)
         {
             this._releaseRestApiProvider = releaseRestApiProvider;
             this.organizationName = organizationName;

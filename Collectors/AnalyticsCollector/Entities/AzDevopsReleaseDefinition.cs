@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using AnalyticsCollector.KustoService;
 using Kusto.Data.Common;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -16,8 +17,8 @@ namespace AnalyticsCollector
         private readonly string _projectId;
         private int BatchSize = 10000;
 
-        public AzDevopsReleaseDefinition(ReleaseRestAPIProvider releaseRestApiProvider, string kustoConnectionString, string aadTenantIdOrTenantName, string organizationName, string projectId)
-            : base(kustoConnectionString, aadTenantIdOrTenantName)
+        public AzDevopsReleaseDefinition(ReleaseRestAPIProvider releaseRestApiProvider, IKustoClientFactory kustoClientFactory, string kustoConnectionString, string aadTenantIdOrTenantName, string organizationName, string projectId)
+            : base(kustoClientFactory, kustoConnectionString, aadTenantIdOrTenantName)
         {
             this._releaseRestApiProvider = releaseRestApiProvider;
             this._organizationName = organizationName;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using AnalyticsCollector.KustoService;
 using Kusto.Data.Common;
 using Newtonsoft.Json;
 
@@ -14,8 +15,8 @@ namespace AnalyticsCollector
         private readonly string organizationName;
         private readonly string projectId;
 
-        public AzDevopsAgentJobRequests(AgentJobRequestAPIProvider agentsRequestRestApiProvider, string kustoConnectionString, string aadTenantIdOrTenantName, string organizationName, string projectId)
-            : base(kustoConnectionString, aadTenantIdOrTenantName)
+        public AzDevopsAgentJobRequests(AgentJobRequestAPIProvider agentsRequestRestApiProvider, IKustoClientFactory kustoClientFactory, string kustoConnectionString, string aadTenantIdOrTenantName, string organizationName, string projectId)
+            : base(kustoClientFactory, kustoConnectionString, aadTenantIdOrTenantName)
         {
             this.organizationName = organizationName;
             this.projectId = projectId;

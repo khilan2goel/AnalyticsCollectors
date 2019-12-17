@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using AnalyticsCollector.KustoService;
 using Kusto.Data.Common;
 
 namespace AnalyticsCollector
@@ -13,8 +14,8 @@ namespace AnalyticsCollector
         private string organizationName;
         private string projectId;
 
-        public AzDevopsWaterMark(string kustoConnectionString, string aadTenantIdOrTenantName, string organization, string projectId)
-            : base(kustoConnectionString, aadTenantIdOrTenantName)
+        public AzDevopsWaterMark(IKustoClientFactory kustoClientFactory, string kustoConnectionString, string aadTenantIdOrTenantName, string organization, string projectId)
+            : base(kustoClientFactory, kustoConnectionString, aadTenantIdOrTenantName)
         {
             this.CreateTableIfNotExists(table, mappingName);
             this.organizationName = organization;
