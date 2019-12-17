@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using AnalyticsCollector.KustoService;
 using Kusto.Cloud.Platform.Utils;
 using Kusto.Data;
 using Kusto.Data.Common;
-using Kusto.Data.Net.Client;
 using Kusto.Ingest;
+using KustoClientFactory = Kusto.Data.Net.Client.KustoClientFactory;
 
 namespace AnalyticsCollector
 {
@@ -16,11 +17,13 @@ namespace AnalyticsCollector
         private string _kustoConnectionString;
         private string _aadTenantIdOrTenantName;
         private string _databaseName;
+        private IKustoQueuedIngestClient ingestionClient;
 
-        protected AzureDataExplorerService(string kustoConnectionString, string aadTenantIdOrTenantName)
+        protected AzureDataExplorerService(IKustoClientFactory kustoClientFactory, string kustoConnectionString, string aadTenantIdOrTenantName)
         {
-            this._kustoConnectionString = kustoConnectionString; 
+            this._kustoConnectionString = kustoConnectionString;
             this._aadTenantIdOrTenantName = aadTenantIdOrTenantName;
+            this.ingestionClient = kustoClientFactory.GetQueuedIngestClient();
         }
 
         protected abstract List<Tuple<string, string>> GetColumns();
@@ -29,31 +32,24 @@ namespace AnalyticsCollector
 
         public void IngestData(string table, string mappingName, Stream memStream)
         {
-            // Create Ingest Client
-            var kcsbDM =
-                new KustoConnectionStringBuilder($"https://ingest-{_kustoConnectionString}").WithAadUserPromptAuthentication(authority: $"{_aadTenantIdOrTenantName}");
+            var ingestProps =
+                new KustoQueuedIngestionProperties(DatabaseName, table)
+                {
+                    ReportLevel = IngestionReportLevel.FailuresAndSuccesses,
+                    ReportMethod = IngestionReportMethod.Queue,
+                    JSONMappingReference = mappingName,
+                    Format = DataSourceFormat.json
+                };
 
-            using (var ingestClient = KustoIngestFactory.CreateQueuedIngestClient(kcsbDM))
-            {
-                var ingestProps =
-                    new KustoQueuedIngestionProperties(DatabaseName, table)
-                    {
-                        ReportLevel = IngestionReportLevel.FailuresAndSuccesses,
-                        ReportMethod = IngestionReportMethod.Queue,
-                        JSONMappingReference = mappingName,
-                        Format = DataSourceFormat.json
-                    };
+            ingestionClient.IngestFromStream(memStream, ingestProps, leaveOpen: true);
 
-                ingestClient.IngestFromStream(memStream, ingestProps, leaveOpen: true);
+            // Wait and retrieve all notifications
+            Thread.Sleep(10000);
+            var errors = ingestionClient.GetAndDiscardTopIngestionFailuresAsync().GetAwaiter().GetResult();
+            var successes = ingestionClient.GetAndDiscardTopIngestionSuccessesAsync().GetAwaiter().GetResult();
 
-                // Wait and retrieve all notifications
-                Thread.Sleep(10000);
-                var errors = ingestClient.GetAndDiscardTopIngestionFailuresAsync().GetAwaiter().GetResult();
-                var successes = ingestClient.GetAndDiscardTopIngestionSuccessesAsync().GetAwaiter().GetResult();
-
-                errors.ForEach((f) => { Console.WriteLine($"Ingestion error: {f.Info.Details}"); });
-                successes.ForEach((s) => { Console.WriteLine($"Ingested: {s.Info.IngestionSourcePath}"); });
-            }
+            errors.ForEach((f) => { Console.WriteLine($"Ingestion error: {f.Info.Details}"); });
+            successes.ForEach((s) => { Console.WriteLine($"Ingested: {s.Info.IngestionSourcePath}"); });
         }
 
         public void CreateTableIfNotExists(string table, string mappingName)
@@ -69,7 +65,7 @@ namespace AnalyticsCollector
                 {
                     // check if already exists.
                     var showTableCommands = CslCommandGenerator.GenerateTablesShowDetailsCommand();
-                    var existingTables = kustoAdminClient.ExecuteControlCommand<IngestionMappingShowCommandResult>(DatabaseName, showTableCommands).Select( x => x.Name).ToList();
+                    var existingTables = kustoAdminClient.ExecuteControlCommand<IngestionMappingShowCommandResult>(DatabaseName, showTableCommands).Select(x => x.Name).ToList();
 
                     if (existingTables.Contains(table))
                     {
