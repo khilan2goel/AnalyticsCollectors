@@ -13,7 +13,8 @@
 - Run below command from windows command prompt:  
 `AnalyticsCollector.exe alias token connectionURI aadTenantIdOrTenantName OrganizationName ProjectName`
 
-* NOTE: 
+
+#### NOTE: 
 Sometimes, Azure Data explorer connection is cached, please make sure to delete token from `%APPDATA%\Kusto\tokenCache.data` and try again.
 
 ### Parameters required for invoking collectors
