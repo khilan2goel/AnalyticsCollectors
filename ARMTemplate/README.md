@@ -1,7 +1,7 @@
 ### Steps to provision Azure Data explorer in your subscription using ARM template.
 
 Below commandlets will run on PowerShell.
-Make sure to install Azure CLI
+Make sure to install [Azure Powershell](https://docs.microsoft.com/en-us/powershell/azure/?view=azps-2.8.0)
 
 ## Login into Azure RM account
 - Login-AzureRmAccount
