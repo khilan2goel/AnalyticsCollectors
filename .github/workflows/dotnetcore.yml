@@ -14,4 +14,5 @@ jobs:
       uses: warrenbuckley/Setup-MSBuild@v1
       
     - name: Build with MSBuild
+      working-directory: Collectors/AnalyticsCollector
       run: msbuild  AnalyticsCollector.csproj -p:Configuration=Release
