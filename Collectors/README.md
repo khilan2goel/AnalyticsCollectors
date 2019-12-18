@@ -4,11 +4,17 @@
 - Use `Build Solution` to build the source code.
 - Add arguments in Debug properties for project.
 
-### Download artifacts directly to run using CLI without VS
+* Binaries for each assembly are produced in the
+`AnalyticsCollectors/Collectors/AnalyticsCollector/bin/Debug` directory. We can invoke exe generated in this folder using command line arguments as well.
+
+### Directly using artifacts to run collectors
 
 - Download artifacts from [here](https://github.com/khilan2goel/AnalyticsCollectors/suites/363971853/artifacts/741992)
-- Run below command from command prompt:  
+- Run below command from windows command prompt:  
 `AnalyticsCollector.exe alias token connectionURI aadTenantIdOrTenantName OrganizationName ProjectName`
+
+* NOTE: 
+Sometimes, Azure Data explorer connection is cached, please make sure to delete token from `%APPDATA%\Kusto\tokenCache.data` and try again.
 
 ### Parameters required for invoking collectors
 
@@ -19,9 +25,3 @@
    - aadTenantIdOrTenantName for making Azure Data explorer AAD connection (either provide AAD tenant GUID or AAD domain name. eg - microsoft.com)
    - OrganizationName for Azure Devops from where to pull data (eg - mseng)
    - ProjectName for Azure Devops from where to pull data (eg - AzureDevops)
-
-* Binaries for each assembly are produced in the
-`AnalyticsCollectors/Collectors/AnalyticsCollector/bin/Debug` directory. We can invoke exe generated in this folder using command line arguments as well.
-
-* NOTE: 
-Sometimes, Azure Data explorer connection is cached, please make sure to delete token from `%APPDATA%\Kusto\tokenCache.data` and try again.
