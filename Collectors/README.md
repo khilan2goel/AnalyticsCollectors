@@ -4,6 +4,12 @@
 - Use `Build Solution` to build the source code.
 - Add arguments in Debug properties for project.
 
+### Download artifacts directly to run using CLI without VS
+
+- Download artifacts from [here](https://github.com/khilan2goel/AnalyticsCollectors/suites/363971853/artifacts/741992)
+- Run below command from command prompt:  
+`AnalyticsCollector.exe alias token connectionURI aadTenantIdOrTenantName OrganizationName ProjectName`
+
 ### Parameters required for invoking collectors
 
 * Here are the parameters required : 
