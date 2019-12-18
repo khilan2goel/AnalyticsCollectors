@@ -9,11 +9,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@master
-    - name: Setup Nuget.exe
-      uses: warrenbuckley/Setup-Nuget@v1
-    - name: Restore packages
-      run: nuget restore AnalyticsCollector
+      
     - name: Setup MSBuild.exe
       uses: warrenbuckley/Setup-MSBuild@v1
+      
     - name: Build with MSBuild
-      run: msbuild  AnalyticsCollector -p:Configuration=Release
+      run: msbuild  AnalyticsCollector.csproj -p:Configuration=Release
