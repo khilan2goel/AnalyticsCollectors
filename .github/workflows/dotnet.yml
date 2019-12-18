@@ -23,3 +23,7 @@ jobs:
     - name: Build with MSBuild
       working-directory: Collectors/AnalyticsCollector
       run: msbuild  AnalyticsCollector.csproj -p:Configuration=Release
+      
+    - uses: actions/upload-artifact@v1
+      with:
+        name: AnalyticsCollector
