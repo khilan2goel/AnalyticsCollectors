@@ -15,7 +15,7 @@ namespace AnalyticsCollector
         private readonly string _mappingName = "ReleaseDefinition_mapping_2";
         private readonly string _organizationName;
         private readonly string _projectId;
-        private int BatchSize = 10000;
+        private int batchSize = 10000;
 
         public AzDevopsReleaseDefinition(ReleaseRestAPIProvider releaseRestApiProvider, IKustoClientFactory kustoClientFactory, string organizationName, string projectId)
             : base(kustoClientFactory)
@@ -93,7 +93,7 @@ namespace AnalyticsCollector
                     writer.WriteLine(JsonConvert.SerializeObject(jObject));
                 }
 
-            } while (currentCount != 0 && continuationToken != 0 && count <= BatchSize);
+            } while (currentCount != 0 && continuationToken != 0 && count <= batchSize);
         }
 
         protected override List<Tuple<string, string>> GetColumns()

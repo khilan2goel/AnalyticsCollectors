@@ -36,7 +36,7 @@ namespace AnalyticsCollector
 
         public List<Deployment> GetDeployments(DateTime minModifiedDateTime, int? continuationToken, out int nextContinuationToken)
         {
-            var url = $"https://vsrm.dev.azure.com/{this.organizationName}/{this.projectName}/_apis/release/deployments?queryOrder=ascending&minModifiedTime={minModifiedDateTime}&continuationToken={continuationToken}";
+            var url = $"https://vsrm.dev.azure.com/{this.organizationName}/{this.projectName}/_apis/release/deployments?queryOrder=ascending&minModifiedTime={minModifiedDateTime}&continuationToken={continuationToken}&$top=100";
             Task<HttpResponseMessage> response = this.httpClient.GetAsync(new Uri(url));
             nextContinuationToken = 0;
             var statusCode = response.Result.StatusCode;
@@ -77,7 +77,7 @@ namespace AnalyticsCollector
 
         public List<Release> GetReleases(DateTime minCreatedDateTime, int continuationToken, out int nextContinuationToken, ReleaseExpands releaseexpands = ReleaseExpands.None)
         {
-            var url = $"https://vsrm.dev.azure.com/{this.organizationName}/{this.projectName}/_apis/release/releases?queryOrder=ascending&minCreatedTime={minCreatedDateTime}&continuationToken={continuationToken}&$expand={releaseexpands}";
+            var url = $"https://vsrm.dev.azure.com/{this.organizationName}/{this.projectName}/_apis/release/releases?queryOrder=ascending&minCreatedTime={minCreatedDateTime}&continuationToken={continuationToken}&$expand={releaseexpands}&$top=100";
             Task<HttpResponseMessage> response = this.httpClient.GetAsync(new Uri(url));
             nextContinuationToken = 0;
             var statusCode = response.Result.StatusCode;

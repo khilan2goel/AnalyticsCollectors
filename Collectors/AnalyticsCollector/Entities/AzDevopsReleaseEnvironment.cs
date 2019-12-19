@@ -16,7 +16,7 @@ namespace AnalyticsCollector
         private readonly string mappingName = "ReleaseEnvironment_mapping_2";
         private readonly string organizationName;
         private readonly string projectId;
-        private int BatchSize = 500;
+        private int batchSize = 500;
 
         public AzDevopsReleaseEnvironment(ReleaseRestAPIProvider releaseRestApiProvider, IKustoClientFactory kustoClientFactory, string organizationName, string projectId)
             : base(kustoClientFactory)
@@ -34,7 +34,6 @@ namespace AnalyticsCollector
                 var waterMark = azureAzDevopsWaterMark.ReadWaterMark(this.table);
                 int continuationToken;
                 DateTime minCreatedDateTime;
-                int count = 0;
                 int totalCount;
                 do
                 {
@@ -53,8 +52,7 @@ namespace AnalyticsCollector
                     waterMark = string.Format("{0},{1}", continuationToken, minCreatedDateTime);
                     azureAzDevopsWaterMark.UpdateWaterMark(table, waterMark);
 
-                    count++;
-                } while (count != 10 && totalCount > 0);
+                } while (totalCount > 0);
             }
             catch (Exception ex)
             {
@@ -112,7 +110,7 @@ namespace AnalyticsCollector
                     writer.WriteLine(releaseObject);
                 }
 
-            } while (currentCount !=0 && continuationToken != 0 && count <= BatchSize);
+            } while (currentCount !=0 && continuationToken != 0 && count <= batchSize);
         }
 
         protected override List<Tuple<string, string>> GetColumns()
