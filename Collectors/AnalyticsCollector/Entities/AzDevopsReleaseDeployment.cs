@@ -33,21 +33,25 @@ namespace AnalyticsCollector
                 var waterMark = azureAzDevopsWaterMark.ReadWaterMark(this.table);
                 int continuationToken;
                 DateTime minModifiedDate;
-
-                using (var memStream = new MemoryStream())
-                using (var writer = new StreamWriter(memStream))
+                int totalCount;
+                do
                 {
-                    // Write data to table
-                    WriteData(writer, waterMark, out continuationToken, out minModifiedDate);
+                    using (var memStream = new MemoryStream())
+                    using (var writer = new StreamWriter(memStream))
+                    {
+                        // Write data to table
+                        WriteData(writer, waterMark, out continuationToken, out minModifiedDate, out totalCount);
 
-                    writer.Flush();
-                    memStream.Seek(0, SeekOrigin.Begin);
+                        writer.Flush();
+                        memStream.Seek(0, SeekOrigin.Begin);
 
-                    this.IngestData(table, mappingName, memStream);
-                }
+                        this.IngestData(table, mappingName, memStream);
+                    }
 
-                waterMark = string.Format("{0},{1}", continuationToken, minModifiedDate);
-                azureAzDevopsWaterMark.UpdateWaterMark(table, waterMark);
+                    waterMark = string.Format("{0},{1}", continuationToken, minModifiedDate);
+                    azureAzDevopsWaterMark.UpdateWaterMark(table, waterMark);
+
+                } while (totalCount > 0);
             }
             catch (Exception ex)
             {
@@ -55,7 +59,7 @@ namespace AnalyticsCollector
             }
         }
 
-        private void WriteData(StreamWriter writer, string waterMark, out int continuationToken, out DateTime minModifiedDate)
+        private void WriteData(StreamWriter writer, string waterMark, out int continuationToken, out DateTime minModifiedDate, out int totalCount)
         {
             ParsingHelper.TryParseWaterMark(waterMark, out continuationToken, out minModifiedDate);
             int count = 0;
@@ -84,6 +88,7 @@ namespace AnalyticsCollector
                     }
                 }
 
+                totalCount = deployments.Count;
                 foreach (var deployment in deployments)
                 {
                     JObject jObject = JObject.FromObject(deployment);

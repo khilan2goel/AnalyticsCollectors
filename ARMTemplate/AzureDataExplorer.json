@@ -76,7 +76,7 @@
             ],
             "kind": "ReadWrite",
             "properties": {
-                "softDeletePeriod": "P3650D",
+                "softDeletePeriod": "P60D",
                 "hotCachePeriod": "P31D"
             }
         }
