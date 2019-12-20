@@ -71,7 +71,7 @@ namespace AnalyticsCollector
                 return releases;
             }
 
-            Console.WriteLine($"Got HttpStatusCode: {statusCode}");
+            Logger.Error($"Got HttpStatusCode: {statusCode}");
             return null;
         }
 
@@ -112,7 +112,7 @@ namespace AnalyticsCollector
                 return releases;
             }
 
-            Console.WriteLine($"Got HttpStatusCode: {statusCode}");
+            Logger.Error($"Got HttpStatusCode: {statusCode}");
             return null;
         }
 
@@ -158,7 +158,7 @@ namespace AnalyticsCollector
                 return releaseDefinitions;
             }
 
-            Console.WriteLine($"Got HttpStatusCode: {statusCode}");
+            Logger.Error($"Got HttpStatusCode: {statusCode}");
             return null;
         }
 

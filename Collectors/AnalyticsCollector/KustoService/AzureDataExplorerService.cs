@@ -46,8 +46,8 @@ namespace AnalyticsCollector
             var errors = _ingestionClient.GetAndDiscardTopIngestionFailuresAsync().GetAwaiter().GetResult();
             var successes = _ingestionClient.GetAndDiscardTopIngestionSuccessesAsync().GetAwaiter().GetResult();
 
-            errors.ForEach((f) => { Console.WriteLine($"Ingestion error: {f.Info.Details}."); });
-            successes.ForEach((s) => { Console.WriteLine($"Ingested : {s.Info.IngestionSourcePath}"); });
+            errors.ForEach((f) => { Logger.Error($"Ingestion error: {f.Info.Details}."); });
+            successes.ForEach((s) => { Logger.Info($"Ingested : {s.Info.IngestionSourcePath}"); });
         }
 
         public void CreateTableIfNotExists(string table, string mappingName)
@@ -79,6 +79,7 @@ namespace AnalyticsCollector
             catch (Exception ex)
             {
                 Console.WriteLine("Cannot create table due to {0}", ex);
+                Logger.Error($"Cannot create table due to {ex}");
             }
         }
 
@@ -128,6 +129,8 @@ namespace AnalyticsCollector
                 catch (Exception ex)
                 {
                     Console.WriteLine("Cannot read database due to {0}. Possible reason could be database not created or clean {1} and try again", ex, "%APPDATA%\\Kusto\\tokenCache.data");
+                    Logger.Error(
+                        $"Cannot read database due to {ex}. Possible reason could be database not created or clean %APPDATA%\\Kusto\\tokenCache.data and try again");
                     throw;
                 }
 
