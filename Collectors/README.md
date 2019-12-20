@@ -9,7 +9,7 @@
 
 ### Directly using artifacts to run collectors
 
-- Download artifacts from [here](https://github.com/khilan2goel/AnalyticsCollectors/suites/367161275/artifacts/768413)
+- Download artifacts from [here](https://github.com/khilan2goel/AnalyticsCollectors/suites/368469212/artifacts/780984)
 - Run below command from windows command prompt:  
 `AnalyticsCollector.exe alias token connectionURI aadTenantIdOrTenantName OrganizationName ProjectName`
 
