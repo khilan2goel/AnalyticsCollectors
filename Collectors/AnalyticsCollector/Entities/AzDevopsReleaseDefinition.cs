@@ -50,7 +50,9 @@ namespace AnalyticsCollector
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Not able to ingest ReleaseDefinition entity due to {ex}");
+                string error = $"Not able to ingest ReleaseDefinition entity due to {ex}";
+                Console.WriteLine(error);
+                Logger.Error(error);
             }
         }
 
@@ -58,6 +60,7 @@ namespace AnalyticsCollector
         private void WriteData(StreamWriter writer, string waterMark, out int continuationToken)
         {
             Int32.TryParse(waterMark, out continuationToken);
+            Logger.Info($"Starting ingesting releasedefinition : {continuationToken}");
 
             int count = 0;
             int currentCount;
@@ -65,6 +68,8 @@ namespace AnalyticsCollector
             {
                 var releaseDefinitions = this._releaseRestApiProvider.GetReleaseDefinitions(continuationToken, out int continuationTokenOutput);
                 Console.WriteLine($"ReleaseDefinition: {continuationToken}");
+                Logger.Info($"ReleaseDefinition: {continuationToken}");
+
                 currentCount = releaseDefinitions.Count;
                 count += currentCount;
 

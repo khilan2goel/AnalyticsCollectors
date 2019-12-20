@@ -56,19 +56,25 @@ namespace AnalyticsCollector
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Not able to ingest Releaseenvironment entity due to {ex}");
+                string error = $"Not able to ingest Releaseenvironment entity due to {ex}";
+                Console.WriteLine(error);
+                Logger.Error(error);
             }
         }
 
         private void WriteData(StreamWriter writer, string waterMark, out int continuationToken, out DateTime minCreatedDateTime, out int totalCount)
         {
             ParsingHelper.TryParseWaterMark(waterMark, out continuationToken, out minCreatedDateTime);
+            Logger.Info($"Starting ingesting releaseenvironment : {continuationToken}, {minCreatedDateTime}");
+
             int count = 0;
             int currentCount;
             do
             {
                 var releases = this._releaseRestApiProvider.GetReleases(minCreatedDateTime, continuationToken, out int continuationTokenOutput);
                 Console.WriteLine($"ReleaseEnvironment: {continuationToken}");
+                Logger.Info($"ReleaseEnvironment: {continuationToken}");
+
                 currentCount = releases.Count;
                 count += currentCount;
 

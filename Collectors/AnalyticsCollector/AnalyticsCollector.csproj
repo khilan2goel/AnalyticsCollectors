@@ -234,6 +234,7 @@
     <Compile Include="Entities\AzDevopsWaterMark.cs" />
     <Compile Include="KustoService\IKustoClientFactory.cs" />
     <Compile Include="KustoService\KustoClientFactory.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="ParsingHelper.cs" />
     <Compile Include="RestAPIProvider\AgentJobRequestAPIProvider.cs" />
     <Compile Include="RestAPIProvider\HttpRestAPIProvider.cs" />

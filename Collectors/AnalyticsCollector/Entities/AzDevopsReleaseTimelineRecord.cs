@@ -59,19 +59,25 @@ namespace AnalyticsCollector
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Not able to ingest Releasetimelinerecord entity due to {ex}");
+                string error = $"Not able to ingest Releasetimelinerecord entity due to {ex}";
+                Console.WriteLine(error);
+                Logger.Error(error);
             }
         }
 
         private void WriteData(StreamWriter writer, string waterMark, out int continuationToken, out DateTime minCreatedDateTime, out int totalCount)
         {
             ParsingHelper.TryParseWaterMark(waterMark, out continuationToken, out minCreatedDateTime);
+            Logger.Info($"Starting ingesting releaseTimelineRecord : {continuationToken}, {minCreatedDateTime}");
+
             int count = 0;
             int currentCount;
             do
             {
                 var releases = this._releaseRestApiProvider.GetReleases(minCreatedDateTime, continuationToken, out int continuationTokenOutput, ReleaseExpands.Environments);
                 Console.WriteLine($"ReleaseTimelineRecord: {continuationToken}");
+                Logger.Info($"ReleaseTimelineRecord: {continuationToken}");
+
                 currentCount = releases.Count;
                 count += currentCount;
 
