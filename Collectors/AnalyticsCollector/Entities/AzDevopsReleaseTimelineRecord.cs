@@ -60,7 +60,6 @@ namespace AnalyticsCollector
             catch (Exception ex)
             {
                 string error = $"Not able to ingest Releasetimelinerecord entity due to {ex}";
-                Console.WriteLine(error);
                 Logger.Error(error);
             }
         }
@@ -75,7 +74,6 @@ namespace AnalyticsCollector
             do
             {
                 var releases = this._releaseRestApiProvider.GetReleases(minCreatedDateTime, continuationToken, out int continuationTokenOutput, ReleaseExpands.Environments);
-                Console.WriteLine($"ReleaseTimelineRecord: {continuationToken}");
                 Logger.Info($"ReleaseTimelineRecord: {continuationToken}");
 
                 currentCount = releases.Count;

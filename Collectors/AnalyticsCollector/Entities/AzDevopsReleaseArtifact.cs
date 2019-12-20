@@ -56,7 +56,6 @@ namespace AnalyticsCollector
             catch (Exception ex)
             {
                 string error = $"Not able to ingest ReleaseArtifact entity due to {ex}";
-                Console.WriteLine(error);
                 Logger.Error(error);
             }
         }
@@ -71,7 +70,6 @@ namespace AnalyticsCollector
             do
             {
                 var releases = this._releaseRestApiProvider.GetReleases(minCreatedDateTime, continuationToken, out int continuationTokenOutput, ReleaseExpands.Artifacts);
-                Console.WriteLine($"ReleaseArtifact: {continuationToken}");
                 Logger.Info($"ReleaseArtifact: {continuationToken}");
 
                 currentCount = releases.Count;

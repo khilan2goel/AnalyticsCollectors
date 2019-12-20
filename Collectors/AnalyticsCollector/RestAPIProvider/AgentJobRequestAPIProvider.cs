@@ -42,7 +42,7 @@ namespace AnalyticsCollector
             }
             else
             {
-                Console.WriteLine($"Got HttpStatusCode: {statusCode}");
+                Logger.Info($"Got HttpStatusCode: {statusCode}");
                 return null;
             }
         }
