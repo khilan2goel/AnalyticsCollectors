@@ -27,7 +27,6 @@ namespace AnalyticsCollector
 
                 var azDevopsReleaseProvider = new ReleaseRestAPIProvider(alias, token, organizationName, projectName);
                 var azDevopsProjectsProvider = new ProjectRestAPIProvider(projectHttpClient, projectName);
-
                 var projectId = azDevopsProjectsProvider.GetProjectInfo(projectName).Id.ToString();
 
                 var axAzDevopsWaterMark = new AzDevopsWaterMark(kustoClientFactory, organizationName, projectId);
@@ -43,7 +42,6 @@ namespace AnalyticsCollector
                     kustoClientFactory, organizationName, projectId);
                 //var azDevopsReleaseTimelineRecordIngestor = new AzDevopsReleaseTimelineRecord(azDevopsReleaseProvider, kustoClientFactory, organizationName, projectId);
 
-                Console.WriteLine("Ingestion started for Release Entities");
                 Logger.Info("Ingestion started for Release Entities");
 
                 Parallel.Invoke(
@@ -55,10 +53,7 @@ namespace AnalyticsCollector
                     //() => azDevopsReleaseTimelineRecordIngestor.IngestData(axAzDevopsWaterMark)
                 );
 
-                Console.WriteLine(
-                    "Ingestion completed. It may take around 5 minutes to reflect whole data in Azure Data explorer");
                 Logger.Info("Ingestion completed. It may take around 5 minutes to reflect whole data in Azure Data explorer");
-
                 Console.ReadKey();
             }
             catch (Exception ex)

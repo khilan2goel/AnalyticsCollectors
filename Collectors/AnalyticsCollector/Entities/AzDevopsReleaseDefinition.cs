@@ -51,7 +51,6 @@ namespace AnalyticsCollector
             catch (Exception ex)
             {
                 string error = $"Not able to ingest ReleaseDefinition entity due to {ex}";
-                Console.WriteLine(error);
                 Logger.Error(error);
             }
         }
@@ -67,7 +66,6 @@ namespace AnalyticsCollector
             do
             {
                 var releaseDefinitions = this._releaseRestApiProvider.GetReleaseDefinitions(continuationToken, out int continuationTokenOutput);
-                Console.WriteLine($"ReleaseDefinition: {continuationToken}");
                 Logger.Info($"ReleaseDefinition: {continuationToken}");
 
                 currentCount = releaseDefinitions.Count;

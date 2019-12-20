@@ -55,7 +55,7 @@ namespace AnalyticsCollector
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Got Exception: {ex}");
+                    Logger.Error($"Got Exception: {ex}");
                 }
 
                 string result = responseContent.ReadAsStringAsync().Result;
@@ -96,7 +96,7 @@ namespace AnalyticsCollector
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Got Exception: {ex}");
+                    Logger.Error($"Got Exception: {ex}");
                 }
 
                 string result = responseContent.ReadAsStringAsync().Result;
@@ -142,7 +142,7 @@ namespace AnalyticsCollector
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Got Exception: {ex}");
+                    Logger.Error($"Got Exception: {ex}");
                 }
 
                 string result = responseContent.ReadAsStringAsync().Result;

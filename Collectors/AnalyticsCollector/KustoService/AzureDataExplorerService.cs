@@ -62,7 +62,7 @@ namespace AnalyticsCollector
 
                     if (existingTables.Contains(table))
                     {
-                        Console.WriteLine($"Table {table} already exists");
+                        Logger.Info($"Table {table} already exists");
                         return;
                     }
 
@@ -78,7 +78,6 @@ namespace AnalyticsCollector
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Cannot create table due to {0}", ex);
                 Logger.Error($"Cannot create table due to {ex}");
             }
         }
@@ -128,7 +127,6 @@ namespace AnalyticsCollector
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Cannot read database due to {0}. Possible reason could be database not created or clean {1} and try again", ex, "%APPDATA%\\Kusto\\tokenCache.data");
                     Logger.Error(
                         $"Cannot read database due to {ex}. Possible reason could be database not created or clean %APPDATA%\\Kusto\\tokenCache.data and try again");
                     throw;

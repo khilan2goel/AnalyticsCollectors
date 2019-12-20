@@ -56,7 +56,6 @@ namespace AnalyticsCollector
             catch (Exception ex)
             {
                 string error = $"Not able to ingest ReleaseDeployment entity due to {ex}";
-                Console.WriteLine(error);
                 Logger.Error(error);
             }
         }
@@ -71,7 +70,6 @@ namespace AnalyticsCollector
             do
             {
                 var deployments = this._releaseRestApiProvider.GetDeployments(minModifiedDate, continuationToken, out int continuationTokenOutput);
-                Console.WriteLine($"ReleaseDeployment: {continuationToken}");
                 Logger.Info($"ReleaseDeployment: {continuationToken}");
 
                 currentCount = deployments.Count;

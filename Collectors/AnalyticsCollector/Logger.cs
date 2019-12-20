@@ -27,6 +27,8 @@ namespace AnalyticsCollector
 
         private static void WriteEntry(string message, string type)
         {
+            Console.WriteLine(message);
+
             Trace.WriteLine(
                 string.Format("{0}:{1}:{2}:{3}",
                     "AnalyticsCollector",

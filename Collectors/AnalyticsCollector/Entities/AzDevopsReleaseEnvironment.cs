@@ -57,7 +57,6 @@ namespace AnalyticsCollector
             catch (Exception ex)
             {
                 string error = $"Not able to ingest Releaseenvironment entity due to {ex}";
-                Console.WriteLine(error);
                 Logger.Error(error);
             }
         }
@@ -72,7 +71,6 @@ namespace AnalyticsCollector
             do
             {
                 var releases = this._releaseRestApiProvider.GetReleases(minCreatedDateTime, continuationToken, out int continuationTokenOutput);
-                Console.WriteLine($"ReleaseEnvironment: {continuationToken}");
                 Logger.Info($"ReleaseEnvironment: {continuationToken}");
 
                 currentCount = releases.Count;
